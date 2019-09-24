@@ -267,6 +267,8 @@ void clearScreen(int bx, int cx)
 
   interrupt(16,512,0,0,0);
 
+
+
   if (bx > 0 && cx > 0)
    interrupt(16,1536,4096 * (bx-1) + 256 * (cx-1),0,6223);
 
