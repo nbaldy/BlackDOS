@@ -189,7 +189,20 @@ void writeInt(int num, int out)
 
 readSectors(char *buffer, int sector, int sectorCount)
 {
+  int trackNo;
+  int relSecNo;
+  int headNo;
+
+  trackNo =0;
+  relSecNo = 0;
+  headNo = 0;
+
+  relSecNo = (mod(sector,18)) + 1;
+  headNo = mod((div(sector,18)),2);
+  trackNo = div(sector,36);
   
+
+
 }
 
 
