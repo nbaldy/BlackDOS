@@ -192,16 +192,27 @@ readSectors(char *buffer, int sector, int sectorCount)
   int trackNo;
   int relSecNo;
   int headNo;
+  int ax;
+  int cx;
+  int dx;
+
 
   trackNo =0;
   relSecNo = 0;
   headNo = 0;
+  ax = 0;
+  cx = 0;
+  dx = 0;
 
   relSecNo = (mod(sector,18)) + 1;
   headNo = mod((div(sector,18)),2);
   trackNo = div(sector,36);
-  
 
+  ax = 512 + sectorCount;
+  cx = trackNo * 256 + relSecNo;
+  dx = headNo * 256;
+
+  interrupt(19,ax,buffer,cx,dx);
 
 }
 
