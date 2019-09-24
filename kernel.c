@@ -29,12 +29,17 @@ void printLogo();
 
 void main()
 {
-  char buffer[512];
-  makeInterrupt21();
-  printLogo();
-  interrupt(33,2,buffer,30,1);
-  interrupt(33,0,buffer,0,0);
-  while(1);
+   char buffer[512]; int i;
+   makeInterrupt21();
+   for (i = 0; i < 512; i++) buffer[i] = 0;
+   buffer[0] = 3;
+   buffer[1] = 5;
+   interrupt(33,6,buffer,258,1);
+   interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
+   printLogo();
+   interrupt(33,2,buffer,30,1);
+   interrupt(33,0,buffer,0,0);
+   while (1) ;
 }
 
 void printLogo()
@@ -221,6 +226,53 @@ readSectors(char *buffer, int sector, int sectorCount)
 
 }
 
+writeSectors(char *buffer, int sector, int sectorCount)
+{
+  int trackNo;
+  int relSecNo;
+  int headNo;
+  int ax;
+  int cx;
+  int dx;
+
+
+  trackNo =0;
+  relSecNo = 0;
+  headNo = 0;
+  ax = 0;
+  cx = 0;
+  dx = 0;
+
+  relSecNo = (mod(sector,18)) + 1;
+  headNo = (div(sector,18));
+  headNo = mod(headNo,2);
+  trackNo = div(sector,36);
+
+  ax = 768 + sectorCount;
+  cx = trackNo * 256 + relSecNo;
+  dx = headNo * 256;
+
+  interrupt(19,ax,buffer,cx,dx);
+
+}
+
+void clearScreen(int bx, int cx)
+{
+  int i = 0;
+
+
+
+  for (i; i < 24; ++i)
+    interrupt(16,14*256 + '\n',0,0,0);
+
+  interrupt(16,512,0,0,0);
+
+  if (bx > 0 && cx > 0)
+   interrupt(16,1536,4096 * (bx-1) + 256 * (cx-1),0,6223);
+
+
+
+}
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
@@ -233,8 +285,10 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     case 1: readString(bx); break;
     case 2: readSectors(bx,cx,dx); break;
     /*case 3: case 4: case 5: */
-    /*  case 6: case 7: case 8: case 9: case 10: */
-    /*  case 11: case 12: */
+    case 6:writeSectors(bx,cx,dx); break;
+     /*case 7: case 8: case 9: case 10: */
+    /*  case 11:*/
+    case 12: clearScreen(bx,cx); break;
      case 13: writeInt(bx,cx); break;
      case 14: readInt(bx); break;
      /*case 15: */
