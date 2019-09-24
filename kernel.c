@@ -29,7 +29,11 @@ void printLogo();
 
 void main()
 {
-  
+  char buffer[512]; 
+  makeInterrupt21(); 
+  printLogo(); 
+  interrupt(33,2,buffer,30,1); 
+  interrupt(33,0,buffer,0,0);
   while(1);
 }
 
