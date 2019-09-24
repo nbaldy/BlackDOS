@@ -29,10 +29,10 @@ void printLogo();
 
 void main()
 {
-  char buffer[512]; 
-  makeInterrupt21(); 
-  printLogo(); 
-  interrupt(33,2,buffer,30,1); 
+  char buffer[512];
+  makeInterrupt21();
+  printLogo();
+  interrupt(33,2,buffer,30,1);
   interrupt(33,0,buffer,0,0);
   while(1);
 }
@@ -217,7 +217,7 @@ readSectors(char *buffer, int sector, int sectorCount)
   cx = trackNo * 256 + relSecNo;
   dx = headNo * 256;
 
-  interrupt(19,ax,*buffer,cx,dx);
+  interrupt(19,ax,buffer,cx,dx);
 
 }
 
