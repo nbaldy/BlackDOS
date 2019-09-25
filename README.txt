@@ -1,27 +1,21 @@
-Lab 02 - Operating Systems Nicole Baldy, Elena Falcione, Tim Inzitari
+Lab 03 - Operating Systems Nicole Baldy, Elena Falcione, Tim Inzitari
 
-	In this lab, we created a "readString" function which can read a user-entered
-	line from the console - it continues reading character until "Enter" is
-	pressed, and supports backspace. We get the keyboard input using interrupt 22
-	and print each character after it is pressed using interrupt 16. We then
-	implemented this functionality into interrupt 33, where readString could be
-	called by setting AX = 1 and BX to the address of the character array where
-	input is stored. (CX and DX unused).
+	In this lab, we created a "readSectors" which cna be used to read sectors from a floppy disk - it is provided an initial address, sector count to read and an initial absolute sector to start at. It converts the absolute sector given to a relative sector by using modulus and division on the absolute number. This allows calculations for a trackhead, head number, relative sector number. Using these values we obtain AX, CX, DX and call in interrupt 19, with BX being the address passed in.
 
-	We then created the "writeInt" function which could write an integer to the
-	screen or printer by converting the int to a string using the intToStr
-	function and then calling printStr. We again integrated this method into
-	interrupt 33 with AX = 13, BX = the int to print, and CX = the destination (0
-	= screen or 1 = printer).
+	We then created the write sectors, which is the same process as ReadSectors, but we change a value for AH to 3 (it is 2 in readSectors).
 
-	Finally, we created a "readInt" method which can read a user-entered integer
-	from the console using readString and then converting this intput to an
-	integer. We integrated this functionality into interrupt 33 where AX = 14, and
-	BX is the address of the integer to be stored. With these interrupts complete,
-	we use them in main to create a MadLibs game. The user needs only to run our
-	program and follow the directions, then they should see a note created
-	printer.out based on their input.
+	Finally we created the Clear screen function, which is given 2 integers representing a background and a foreground color. It starts by issuing 24 new line calls using interrupt 16. it then issues an interrupt command 16 to place the cursor in the upper left hand corner after the text has been cleared by the newlines. Then it calls an interrupt 16 to scan the window  and set the foreground and background to that which is specified.
 
-	The very first time our program is run, bootload must be compiled using "nasm
-	bootload.asm". To run our program, use compileOS.sh to compile the operating
-	system, and then run it using 'echo "c" | bochs -f bdos.txt'.
+
+
+The very first time our program is run, bootload must be compiled by executing
+the command
+   "nasm bootload.asm".
+To run our program, use "compileOS.sh" to compile the operating system, then
+execute the command to place msg into sector 30
+   "dd if=msg of=floppya.img bs=512 count=1 seek=30 conv=notrunc"
+And the following command to save the configuration file as a separate file
+	 "dd if=floppy.img of=config bs=512 skip=258 count=1 conv=notrunc"
+ and then run the operating system using
+   "echo "c" | bochs -f bdos.txt"
+
