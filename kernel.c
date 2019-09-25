@@ -29,16 +29,28 @@ void printLogo();
 
 void main()
 {
-   char buffer[512]; int i;
+   char buffer[512];
+   int i;
    makeInterrupt21();
-   for (i = 0; i < 512; i++) buffer[i] = 0;
-   buffer[0] = 3;
-   buffer[1] = 5;
+
+   for (i = 0; i < 512; i++)
+    buffer[i] = 0;
+
+   buffer[0] = 3; //background color
+   buffer[1] = 5; //foreground color
+
+   /* write to sector 258 to create a configuration file with colors*/
    interrupt(33,6,buffer,258,1);
+
+   /* change colors of screen and background */
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
+
    printLogo();
+
+   /* read sector 30 and print its contents */
    interrupt(33,2,buffer,30,1);
    interrupt(33,0,buffer,0,0);
+   
    while (1) ;
 }
 
@@ -196,6 +208,7 @@ void writeInt(int num, int out)
   interrupt(33,0, str, out,0);
 }
 
+/* Takes absolute sector, calculates and reads relative sector into buffer */
 readSectors(char *buffer, int sector, int sectorCount)
 {
   int trackNo;
@@ -213,15 +226,18 @@ readSectors(char *buffer, int sector, int sectorCount)
   cx = 0;
   dx = 0;
 
-  relSecNo = (mod(sector,18)) + 1;
-  headNo = (div(sector,18));
+  /* compute relative sector */
+  relSecNo = mod(sector,18) + 1;
+  headNo = div(sector,18);
   headNo = mod(headNo,2);
   trackNo = div(sector,36);
 
+  /* instructs inturrupt to read from sector */
   ax = 512 + sectorCount;
   cx = trackNo * 256 + relSecNo;
   dx = headNo * 256;
 
+  /* read sector into buffer */
   interrupt(19,ax,buffer,cx,dx);
 
 }
@@ -243,36 +259,40 @@ writeSectors(char *buffer, int sector, int sectorCount)
   cx = 0;
   dx = 0;
 
-  relSecNo = (mod(sector,18)) + 1;
-  headNo = (div(sector,18));
+  /* compute relative sector */
+  relSecNo = mod(sector,18) + 1;
+  headNo = div(sector,18);
   headNo = mod(headNo,2);
   trackNo = div(sector,36);
 
+  /* instructs inturrupt to write to sector */
   ax = 768 + sectorCount;
   cx = trackNo * 256 + relSecNo;
   dx = headNo * 256;
 
+  /* write sector from buffer */
   interrupt(19,ax,buffer,cx,dx);
 
 }
 
+/* bx = background color, cx = character color, and clear screen */
 void clearScreen(int bx, int cx)
 {
   int i = 0;
 
-
-
+  /* clear screen */
   for (i; i < 24; ++i)
+  {
+    interrupt(16,14*256 + '\r',0,0,0);
     interrupt(16,14*256 + '\n',0,0,0);
+  }
 
+  /* reposition cursor in left corner */
   interrupt(16,512,0,0,0);
 
-
-
-  if (bx > 0 && cx > 0)
+  /* set screen and character color */
+  if (bx > 0 && bx < 9 && cx > 0 && cx < 17)
    interrupt(16,1536,4096 * (bx-1) + 256 * (cx-1),0,6223);
-
-
 
 }
 
