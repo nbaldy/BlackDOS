@@ -8,6 +8,12 @@ Lab 03 - Operating Systems Nicole Baldy, Elena Falcione, Tim Inzitari
 
 
 
-	The very first time our program is run, bootload must be compiled using "nasm
-	bootload.asm". To run our program, use compileOS.sh to compile the operating
-	system, and then run it using 'echo "c" | bochs -f bdos.txt'.
+The very first time our program is run, bootload must be compiled by executing
+the command
+   "nasm bootload.asm".
+To run our program, use compileOS.sh to compile the operating system, then
+execute the command 
+   "dd if=msg of=floppya.img bs=512 count=1 seek=30 conv=notrunc"
+to place msg into sector 30 and then run the operating system using
+   "echo "c" | bochs -f bdos.txt"
+
