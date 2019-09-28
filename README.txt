@@ -28,11 +28,7 @@ Lab 03 - Operating Systems Nicole Baldy, Elena Falcione, Tim Inzitari
 The very first time our program is run, bootload must be compiled by executing
 the command
    "nasm bootload.asm".
-To run our program, use "compileOS.sh" to compile the operating system, then
-execute the command to place msg into sector 30
-   "dd if=msg of=floppya.img bs=512 count=1 seek=30 conv=notrunc"
-And the following command to save the configuration file as a separate file
-	 "dd if=floppy.img of=config bs=512 skip=258 count=1 conv=notrunc"
- and then run the operating system using
+Before running our program, use "compileOS.sh" to compile the operating system
+and then run the operating system using
    "echo "c" | bochs -f bdos.txt"
 
