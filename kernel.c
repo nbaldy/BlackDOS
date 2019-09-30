@@ -25,32 +25,23 @@
 /* 3460:4/526 BlackDOS2020 kernel, Version 1.04, Fall 2019.               */
 
 void handleInterrupt21(int,int,int,int);
+void runProgram(int start, int size, int segment);
 void printLogo();
 
 void main()
 {
    char buffer[512];
-   int i;
    makeInterrupt21();
 
-   for (i = 0; i < 512; i++)
-    buffer[i] = 0;
-
-   buffer[0] = 3; //background color
-   buffer[1] = 5; //foreground color
-
-   /* write to sector 258 to create a configuration file with colors*/
-   interrupt(33,6,buffer,258,1);
-
-   /* change colors of screen and background */
+   /* Read sector 258 - config file - into memoty */
+   interrupt(33,2,buffer,258,0);
+   /* Clear screen */
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
-
    printLogo();
 
-   /* read sector 30 and print its contents */
-   interrupt(33,2,buffer,30,1);
-   interrupt(33,0,buffer,0,0);
-   
+   runProgram(30, 1, 2);
+   interrupt(33,0,”Error if this executes.\r\n\0”,0,0);
+
    while (1) ;
 }
 
@@ -68,6 +59,35 @@ interrupt(33,0," Author(s):Nicole Baldy, Elena Falcione, Tim Inzitari.\r\n\r\n\0
 
 /* MAKE FUTURE UPDATES HERE */
 /* VVVVVVVVVVVVVVVVVVVVVVVV */
+
+/* Reads a program from start sector, runs in given segment */
+void runProgram(int start, int size, int segment)
+{
+  char buffer[512];
+  int baseSegment;
+
+  /* call readSectors to load file into local buffer */
+  interrupt(33, 2, buffer, start, size);
+
+  /* get base location of segment or error if invalid */
+  if (segment < 2 || segment > 9) {
+    interrupt(33, 0, "Error: segment invalid. Must be 2-9 inclusive \0", 0,0);
+    return;
+  }
+  baseSegment = 0x1000 * segment;
+
+  /* transfer loaded file from buffer into memory at computed segment */
+  for (int offset=0; offset<512; offset++)
+  {
+    putInMemory(baseSegment, offset, buffer[offset]);
+  }
+
+  /* Launch program */
+  launchProgram(baseSegment);
+
+
+
+}
 
 /* Prints a string to either the console (if d=0) or printer (d=1) */
 void printString(char* c, int d)
