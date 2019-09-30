@@ -1,21 +1,34 @@
 Lab 03 - Operating Systems Nicole Baldy, Elena Falcione, Tim Inzitari
 
-	In this lab, we created a "readSectors" which cna be used to read sectors from a floppy disk - it is provided an initial address, sector count to read and an initial absolute sector to start at. It converts the absolute sector given to a relative sector by using modulus and division on the absolute number. This allows calculations for a trackhead, head number, relative sector number. Using these values we obtain AX, CX, DX and call in interrupt 19, with BX being the address passed in.
+	In this lab, we wrote a readSectors function which reads a sector from the
+	floppy disk - it is provided an initial address, the number of sectors to read
+	and an initial absolute sector to start at. It converts the absolute sector
+	given to a relative sector by using modulus and division on the absolute
+	number. This allows calculations for a trackhead, head number, relative sector
+	number. These values are used to calculate AX, CX, and DX for our call to
+	interrupt 19, with BX being the address passed into our ReadSectors function.
 
-	We then created the write sectors, which is the same process as ReadSectors, but we change a value for AH to 3 (it is 2 in readSectors).
+	We then created the writeSectors function, which uses a similar process as
+	ReadSectors, calling interrupt 19 with AX = 768 + sectorCount, with the rest
+	of the parameters remaining the same as readSectors. This allows us to write
+	the contents of buffer to the disk.
 
-	Finally we created the Clear screen function, which is given 2 integers representing a background and a foreground color. It starts by issuing 24 new line calls using interrupt 16. it then issues an interrupt command 16 to place the cursor in the upper left hand corner after the text has been cleared by the newlines. Then it calls an interrupt 16 to scan the window  and set the foreground and background to that which is specified.
+	Finally we created the clearScreen function, which has two integer parameters
+	which indicate the background and foreground color. Then, it uses interrupt 16
+	to clear the screen by printing 24 newlines, place the cursor in the left-hand
+	corner, and change the background and foreground if applicable.
+
+	When we call inturrupt 33, we call readSectors, writeSectors, and clearScreen
+	if AX is 2, 6, or 12, respectively. In main, we specify a background and
+	foreground color, save this as a configuration file, clear the screen, print
+	the logo, and then print the contents of Sector 30, which should be msg
 
 
 
 The very first time our program is run, bootload must be compiled by executing
 the command
    "nasm bootload.asm".
-To run our program, use "compileOS.sh" to compile the operating system, then
-execute the command to place msg into sector 30
-   "dd if=msg of=floppya.img bs=512 count=1 seek=30 conv=notrunc"
-And the following command to save the configuration file as a separate file
-	 "dd if=floppy.img of=config bs=512 skip=258 count=1 conv=notrunc"
- and then run the operating system using
+Before running our program, use "compileOS.sh" to compile the operating system
+and then run the operating system using
    "echo "c" | bochs -f bdos.txt"
 
