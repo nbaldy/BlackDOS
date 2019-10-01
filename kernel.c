@@ -33,15 +33,14 @@ void main()
    char buffer[512];
    makeInterrupt21();
 
-   /* Read sector 258 - config file - into memoty */
-   interrupt(33,2,buffer,258,0);
+   /* Read sector 258 - config file - into memory */
+   interrupt(33,2,buffer,258,1);
    /* Clear screen */
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
    printLogo();
 
    runProgram(30, 1, 2);
    interrupt(33,0,"Error if this executes.\r\n\0",0,0);
-
    while (1) ;
 }
 
@@ -63,15 +62,16 @@ interrupt(33,0," Author(s):Nicole Baldy, Elena Falcione, Tim Inzitari.\r\n\r\n\0
 /* Reads a program from start sector, runs in given segment */
 void runProgram(int start, int size, int segment)
 {
-  char buffer[0x3000];
+  /*max size - 26 sectors*/
+  char buffer[0x34000];
   int baseSegment;
   int offset;
 
-  if (size > 3)
-  {
-    interrupt(33, 0, "Error: program too large. It can at most take up 3 segments \0", 0,0);
-    return;
-  }
+   if (size > 26)
+   {
+     interrupt(33, 0, "Error: size invalid. Can be no bigger than 26 sectors \0", 0,0);
+     return;
+   }
 
   /* call readSectors to load file into local buffer */
   interrupt(33, 2, buffer, start, size);
@@ -84,15 +84,13 @@ void runProgram(int start, int size, int segment)
   baseSegment = 0x1000 * segment;
 
   /* transfer loaded file from buffer into memory at computed segment */
-  for (offset=0; offset<size*0x1000; offset++)
+  for (offset=0; offset<size*0x2000; offset++)
   {
     putInMemory(baseSegment, offset, buffer[offset]);
   }
 
   /* Launch program */
   launchProgram(baseSegment);
-
-
 
 }
 
