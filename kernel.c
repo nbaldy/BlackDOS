@@ -39,7 +39,10 @@ void main()
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
    printLogo();
 
+   /* Run the program loaded in sector 30*/
    runProgram(30, 1, 2);
+   /*Terminate Program*/
+   interrupt(33,5,0,0);
    interrupt(33,0,"Error if this executes.\r\n\0",0,0);
    while (1) ;
 }
@@ -321,6 +324,9 @@ void clearScreen(int bx, int cx)
 
 }
 
+/*Stop function to allow programs to terminate*/
+void stop() { while (1) ; }
+
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
 
@@ -331,7 +337,8 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
    case 0:  printString(bx, cx); break;
     case 1: readString(bx); break;
     case 2: readSectors(bx,cx,dx); break;
-    /*case 3: case 4: case 5: */
+    /*case 3: case 4: */
+    case 5:stop(); break;
     case 6:writeSectors(bx,cx,dx); break;
      /*case 7: case 8: case 9: case 10: */
     /*  case 11:*/
