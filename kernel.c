@@ -40,7 +40,7 @@ void main()
    printLogo();
 
    runProgram(30, 1, 2);
-   interrupt(33,0,”Error if this executes.\r\n\0”,0,0);
+   interrupt(33,0,"Error if this executes.\r\n\0",0,0);
 
    while (1) ;
 }
@@ -63,8 +63,15 @@ interrupt(33,0," Author(s):Nicole Baldy, Elena Falcione, Tim Inzitari.\r\n\r\n\0
 /* Reads a program from start sector, runs in given segment */
 void runProgram(int start, int size, int segment)
 {
-  char buffer[512];
+  char buffer[0x3000];
   int baseSegment;
+  int offset;
+
+  if (size > 3)
+  {
+    interrupt(33, 0, "Error: program too large. It can at most take up 3 segments \0", 0,0);
+    return;
+  }
 
   /* call readSectors to load file into local buffer */
   interrupt(33, 2, buffer, start, size);
@@ -77,7 +84,7 @@ void runProgram(int start, int size, int segment)
   baseSegment = 0x1000 * segment;
 
   /* transfer loaded file from buffer into memory at computed segment */
-  for (int offset=0; offset<512; offset++)
+  for (offset=0; offset<size*0x1000; offset++)
   {
     putInMemory(baseSegment, offset, buffer[offset]);
   }
