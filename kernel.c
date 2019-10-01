@@ -40,7 +40,8 @@ void main()
    printLogo();
 
    /* Run the program loaded in sector 30*/
-   runProgram(30, 1, 2);
+   runProgram(30, 4, 2);
+
    /*Terminate Program*/
    interrupt(33,5,0,0);
    interrupt(33,0,"Error if this executes.\r\n\0",0,0);
@@ -324,11 +325,11 @@ void clearScreen(int bx, int cx)
 
 }
 
-/*Stop function to allow programs to terminate*/
-void stop() { while (1) ; }
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
+
+/*Stop function to allow programs to terminate*/
 void stop()
 {
   while(1);
