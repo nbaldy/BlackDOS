@@ -1,4 +1,4 @@
-﻿/* ACADEMIC INTEGRITY PLEDGE                                              */
+/* ACADEMIC INTEGRITY PLEDGE                                              */
 /*                                                                        */
 /* - I have not used source code obtained from another student nor        */
 /*   any other unauthorized source, either modified or unmodified.        */
@@ -19,7 +19,7 @@
 /*                                                                        */
 /*                                                                        */
 /*                                                                        */
-/* Signed:_______ Nicole Baldy, Elaine Falcione, Tim Inzitari_______ Date:______9/19/19_______        */
+/* Signed:_______ Nicole Baldy, Elena Falcione, Tim Inzitari_______ Date:______9/19/19_______        */
 /*                                                                        */
 /*                                                                        */
 /* 3460:4/526 BlackDOS2020 kernel, Version 1.04, Fall 2019.               */
@@ -323,6 +323,10 @@ void clearScreen(int bx, int cx)
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
+void stop()
+{
+  while(1);
+}
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
@@ -331,7 +335,8 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
    case 0:  printString(bx, cx); break;
     case 1: readString(bx); break;
     case 2: readSectors(bx,cx,dx); break;
-    /*case 3: case 4: case 5: */
+    /*case 3: case 4: */
+    case 5:  stop(); break;
     case 6:writeSectors(bx,cx,dx); break;
      /*case 7: case 8: case 9: case 10: */
     /*  case 11:*/
