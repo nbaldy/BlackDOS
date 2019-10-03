@@ -39,7 +39,9 @@ void main()
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
    printLogo();
 
-   runProgram(30, 1, 2);
+   /* fib needs 1 sector, madlibs needs 3 sectors, Stenv needs 4 */
+   /* For now, we're keeping it at the max of 26 sectors so that any program can run*/
+   runProgram(30, 26, 2);
    interrupt(33,5,0,0,0);
    interrupt(33,0,"Error if this executes.\r\n\0",0,0);
 
