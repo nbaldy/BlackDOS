@@ -121,9 +121,11 @@ void readString(char* stringarray)
       c = interrupt(22,0,0,0,0);
   }
 
-  /*mark end of input with null character and go to the nextline*/
+  /*mark end of input with null character and print the newline*/
   stringarray[count] = '\0';
-  interrupt(33,0,"\r\n\0",0,0);
+  interrupt(16,14 * 256 + '\r',0,0,0);
+  interrupt(16,14 * 256 + '\n',0,0,0);
+
 }
 
 
@@ -315,7 +317,7 @@ void runProgram(int start, int size, int segment)
   baseSegment = 4096 * segment;
 
   /* transfer loaded file from buffer into memory at computed segment */
-  for (offset=0; offset<size*0x1000; offset++)
+  for (offset=0; offset < 0x3400; offset++)
   {
     putInMemory(baseSegment, offset, buffer[offset]);
   }
