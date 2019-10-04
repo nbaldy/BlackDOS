@@ -25,7 +25,7 @@ To compile the operating system, use
 To compile fib.c or madlibs.c and add the program to the disk at sector 30, use
 	"./addFib.sh" or "./addMadlibs.sh", respectively (will need exe privileges)
 To add a different executable to the program, use
- "dd if=[my_exe] of=floppya.img bs=512 count=[number_of_sectors] seek=30 conv=notrunc"
+ 	"dd if=[my_exe] of=floppya.img bs=512 count=[number_of_sectors] seek=30 conv=notrunc"
 and then run the operating system using
    "echo "c" | bochs -f bdos.txt"
 
