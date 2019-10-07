@@ -33,14 +33,17 @@ void main()
    char buffer[512];
    makeInterrupt21();
 
-   /* Read sector 258 - config file - into memoty */
-   interrupt(33,2,buffer,258,0);
+   /* Read sector 258 - config file - into memory */
+   interrupt(33,2,buffer,258,1);
    /* Clear screen */
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
    printLogo();
 
-   runProgram(30, 1, 2);
-   interrupt(33,0,”Error if this executes.\r\n\0”,0,0);
+   /* fib needs 1 sector, madlibs needs 3 sectors, Stenv needs 4 */
+   /* For now, we're keeping it at the max of 26 sectors so that any program can run*/
+   runProgram(30, 26, 2);
+   interrupt(33,5,0,0,0);
+   interrupt(33,0,"Error if this executes.\r\n\0",0,0);
 
    while (1) ;
 }
@@ -60,34 +63,7 @@ interrupt(33,0," Author(s):Nicole Baldy, Elena Falcione, Tim Inzitari.\r\n\r\n\0
 /* MAKE FUTURE UPDATES HERE */
 /* VVVVVVVVVVVVVVVVVVVVVVVV */
 
-/* Reads a program from start sector, runs in given segment */
-void runProgram(int start, int size, int segment)
-{
-  char buffer[512];
-  int baseSegment;
 
-  /* call readSectors to load file into local buffer */
-  interrupt(33, 2, buffer, start, size);
-
-  /* get base location of segment or error if invalid */
-  if (segment < 2 || segment > 9) {
-    interrupt(33, 0, "Error: segment invalid. Must be 2-9 inclusive \0", 0,0);
-    return;
-  }
-  baseSegment = 0x1000 * segment;
-
-  /* transfer loaded file from buffer into memory at computed segment */
-  for (int offset=0; offset<512; offset++)
-  {
-    putInMemory(baseSegment, offset, buffer[offset]);
-  }
-
-  /* Launch program */
-  launchProgram(baseSegment);
-
-
-
-}
 
 /* Prints a string to either the console (if d=0) or printer (d=1) */
 void printString(char* c, int d)
@@ -147,9 +123,11 @@ void readString(char* stringarray)
       c = interrupt(22,0,0,0,0);
   }
 
-  /*mark end of input with null character and go to the nextline*/
+  /*mark end of input with null character and print the newline*/
   stringarray[count] = '\0';
-  interrupt(33,0,"\r\n\0",0,0);
+  interrupt(16,14 * 256 + '\r',0,0,0);
+  interrupt(16,14 * 256 + '\n',0,0,0);
+
 }
 
 
@@ -316,6 +294,49 @@ void clearScreen(int bx, int cx)
 
 }
 
+/* Reads a program from start sector, runs in given segment */
+void runProgram(int start, int size, int segment)
+{
+  /*max size - 26 sectors*/
+  char buffer[0x34000];
+  int baseSegment;
+  int offset;
+
+   if (size > 26)
+   {
+     interrupt(33, 0, "Error: size invalid. Can be no bigger than 26 sectors \0", 0,0);
+     return;
+   }
+
+  /* call readSectors to load file into local buffer */
+  interrupt(33, 2, buffer, start, size);
+
+  /* get base location of segment or error if invalid */
+  if (segment < 2 || segment > 9) {
+    interrupt(33, 0, "Error: segment invalid. Must be 2-9 inclusive \0", 0,0);
+    return;
+  }
+  baseSegment = 4096 * segment;
+
+  /* transfer loaded file from buffer into memory at computed segment */
+  for (offset=0; offset < 0x3400; offset++)
+  {
+    putInMemory(baseSegment, offset, buffer[offset]);
+  }
+
+  /* Launch program */
+  launchProgram(baseSegment);
+
+  interrupt(33,5,0,0);
+
+}
+
+void stop()
+{
+  while(1);
+}
+
+
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
 
@@ -326,7 +347,8 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
    case 0:  printString(bx, cx); break;
     case 1: readString(bx); break;
     case 2: readSectors(bx,cx,dx); break;
-    /*case 3: case 4: case 5: */
+    /*case 3: case 4:*/
+    case 5: stop();
     case 6:writeSectors(bx,cx,dx); break;
      /*case 7: case 8: case 9: case 10: */
     /*  case 11:*/
