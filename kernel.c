@@ -30,7 +30,7 @@ void printLogo();
 
 void main()
 {
-   char buffer[512];
+   char buffer[512], test[3];
    makeInterrupt21();
 
    /* Read sector 258 - config file - into memory */
@@ -41,7 +41,7 @@ void main()
 
    /* Run Shell proram loaded on Sector 30 - assume 10 Sectors or smaller*/
    runProgram(30, 10, 2);
-   interrupt(33,0,"Bad or missing command interpreter\r\n\0",0,0);
+   interrupt(33,0,"Bad or missing command interpreter\r\n\0",1,0);
 
    while (1) ;
 }
