@@ -39,8 +39,8 @@ void main()
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
    printLogo();
 
-   /* Run Shell proram loaded on Sector 30 - assume 10 Sectors or smaller*/
-   runProgram(30, 10, 2);
+   /* Run Shell proram loaded on Sector 30 - assume 11 Sectors or smaller*/
+   runProgram(30, 11, 2);
    interrupt(33,0,"Bad or missing command interpreter\r\n\0",1,0);
 
    while (1) ;
