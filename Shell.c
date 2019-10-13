@@ -49,20 +49,27 @@ int compare(char *c1, char *c2, int size)
 
 
 /* Read a buffer up to a delimitor or the nullterminator and place this in result*/
+/* Skip leading deliminators*/
 int readToChar(char* buffer, char delim, char* result)
 {
   /* index of delimitor */
-  int len = 1;
-  while(buffer[len] != delim && buffer[len] != '\0')
+  int len = 0;
+  int skip = 0;
+
+  /* skip leading deliminators*/
+  while(buffer[skip] == delim)
+    skip++;
+
+  while(!(buffer[len+skip] == delim || buffer[len+skip] == '\0'))
   {
-    result[len] = buffer[len++];
+    result[len] = buffer[len+skip];
+    len++;
   }
   result[len] = '\0';
 
   /* the index at which the substring ends */
-  return len;
+  return len+skip;
 }
-
 
 /* Reboot terminal - all code after should not execute */
 void boot(char* buffer)
@@ -130,7 +137,7 @@ void copy(char* buffer)
   }
 
   /* Get file1 */
-  start = readToChar(&buffer[start], " ", file1);
+  start +=readToChar(&buffer[start], ' ', file1);
 
   /* No second filename - badly formatted command */
   if(buffer[start] == '\0')
@@ -140,7 +147,7 @@ void copy(char* buffer)
   }
 
   /* Get file2 */
-  start = readToChar(&buffer[start], " ", file2);
+  start +=readToChar(&buffer[start], ' ', file2);
 
   /* Third argument provided - badly formatted command */
   if(buffer[start] == ' ')
@@ -191,7 +198,7 @@ void exec(char* buffer)
   }
 
   /* Get file1 */
-  start = readToChar(&buffer[start], " ", filename);
+  start += readToChar(&buffer[start], ' ', filename);
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
@@ -228,7 +235,7 @@ void help(char* buffer)
 void prnt(char* buffer)
 {
   char filename[80];
-  int start = 1;
+  int start =1;
 
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
@@ -238,7 +245,7 @@ void prnt(char* buffer)
   }
 
   /* Get file1 */
-  start = readToChar(&buffer[start], " ", filename);
+  start +=readToChar(&buffer[start], ' ', filename);
   PRINTS(buffer);
 
   /* Second argument provided - badly formatted command */
@@ -268,7 +275,7 @@ void remv(char* buffer)
   }
 
   /* Get file1 */
-  start = readToChar(&buffer[start], " ", filename);
+  start +=readToChar(&buffer[start], ' ', filename);
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
@@ -290,7 +297,7 @@ void senv(char* buffer)
   if(buffer[0] != '\0')
   {
     if(buffer[0] == ' ')
-      PRINTS("Warning: Argument provided are ignored. Rebooting... \r\n\0");
+      PRINTS("Warning: Argument provided are ignored. \r\n\0");
     else
     { /*attempted 5 char command or mistype*/
       PRINTS("ERROR: Badly formatted command\r\n\0");
@@ -315,7 +322,7 @@ void show(char* buffer)
   }
 
   /* Get file1 */
-  start = readToChar(&buffer[start], " ", filename);
+  start +=readToChar(&buffer[start], ' ', filename);
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
@@ -344,7 +351,7 @@ void twet(char* buffer)
   }
 
   /* Get file1 */
-  start = readToChar(&buffer[start], " ", filename);
+  start +=readToChar(&buffer[start], ' ', filename);
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
