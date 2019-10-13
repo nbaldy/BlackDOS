@@ -1,4 +1,4 @@
-start = 1; /* skip space */#include "blackdos.h"
+#include "blackdos.h"
 
 void parseCmnd(char* buffer, int* cmd, char* arg1, char* arg2);
 
@@ -132,27 +132,27 @@ void copy(char* buffer)
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
   {
-    PRINTS("ERROR: Badly formatted command\r\n\0");
+    PRINTS("ERROR: Badly formatted command. For copy command: copy file1 file2\r\n\0");
     return;
   }
 
   /* Get file1 */
   start +=readToChar(&buffer[start], ' ', file1);
+  /* Get file2 */
+  start +=readToChar(&buffer[start], ' ', file2);
 
-  /* No second filename - badly formatted command */
-  if(buffer[start] == '\0')
+  /* Empty Parameter */
+  if(file1[0] == '\0' || file2[0] == '\0')
   {
-    PRINTS("ERROR: Copy requires two args: copy file1 file2\r\n\0");
+    PRINTS("ERROR: Copy requires two parameters: copy file1 file2\r\n\0");
     return;
   }
 
-  /* Get file2 */
-  start +=readToChar(&buffer[start], ' ', file2);
 
   /* Third argument provided - badly formatted command */
   if(buffer[start] == ' ')
   {
-    PRINTS("Warning: Copy requires only two args: copy file1 file2\r\n\0");
+    PRINTS("Warning: Copy requires only two parameters: copy file1 file2\r\n\0");
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
@@ -193,12 +193,20 @@ void exec(char* buffer)
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
   {
-    PRINTS("ERROR: Badly formatted command\r\n\0");
+    PRINTS("ERROR: Badly formatted command. For Exec command: exec filename\r\n\0");
     return;
   }
 
-  /* Get file1 */
+  /* Get filename */
   start += readToChar(&buffer[start], ' ', filename);
+
+  /*empty parameter*/
+  if(filename[0] == '\0')
+  {
+    PRINTS("ERROR: Exec takes one parameter: exec filename\r\n\0");
+    return;
+  }
+
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
@@ -228,7 +236,6 @@ void help(char* buffer)
     }
   }
 
-
   PRINTS("Command: help\r\n\0");
 }
 
@@ -240,13 +247,19 @@ void prnt(char* buffer)
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
   {
-    PRINTS("ERROR: Badly formatted command\r\n\0");
+    PRINTS("ERROR: Badly formatted command. For Prnt command: prnt filename\r\n\0");
     return;
   }
 
   /* Get file1 */
   start +=readToChar(&buffer[start], ' ', filename);
-  PRINTS(buffer);
+
+  /*empty parameter*/
+  if(filename[0] == '\0')
+  {
+    PRINTS("ERROR: Prnt takes one parameter: prnt filename\r\n\0");
+    return;
+  }
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
@@ -270,12 +283,19 @@ void remv(char* buffer)
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
   {
-    PRINTS("ERROR: Badly formatted command\r\n\0");
+    PRINTS("ERROR: Badly formatted command. For Remv command: remv filename\r\n\0");
     return;
   }
 
   /* Get file1 */
   start +=readToChar(&buffer[start], ' ', filename);
+
+  /*empty parameter*/
+  if(filename[0] == '\0')
+  {
+    PRINTS("ERROR: Remv takes one parameter: remv filename\r\n\0");
+    return;
+  }
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
@@ -317,12 +337,19 @@ void show(char* buffer)
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
   {
-    PRINTS("ERROR: Badly formatted command\r\n\0");
+    PRINTS("ERROR: Badly formatted command. For Show command: show filename\r\n\0");
     return;
   }
 
   /* Get file1 */
   start +=readToChar(&buffer[start], ' ', filename);
+
+  /*empty parameter*/
+  if(filename[0] == '\0')
+  {
+    PRINTS("ERROR: Show takes one parameter: show filename\r\n\0");
+    return;
+  }
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
@@ -346,12 +373,19 @@ void twet(char* buffer)
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
   {
-    PRINTS("ERROR: Badly formatted command\r\n\0");
+    PRINTS("ERROR: Badly formatted command. For Twet command: twet filename\r\n\0");
     return;
   }
 
   /* Get file1 */
   start +=readToChar(&buffer[start], ' ', filename);
+
+  /*empty parameter*/
+  if(filename[0] == '\0')
+  {
+    PRINTS("ERROR: Twet requires one parameter: twet filename\r\n\0");
+    return;
+  }
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
