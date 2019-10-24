@@ -25,7 +25,6 @@
 /* 3460:4/526 BlackDOS2020 kernel, Version 1.04, Fall 2019.               */
 
 void handleInterrupt21(int,int,int,int);
-void runProgram(int start, int size, int segment);
 void printLogo();
 
 void main()
@@ -39,25 +38,23 @@ void main()
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
    printLogo();
 
-   /* fib needs 1 sector, madlibs needs 3 sectors, Stenv needs 4 */
-   /* For now, we're keeping it at the max of 26 sectors so that any program can run*/
-   runProgram(30, 26, 2);
-   interrupt(33,5,0,0,0);
-   interrupt(33,0,"Error if this executes.\r\n\0",0,0);
+   /* Run Program */
+   interrupt(33,4,"Stenv\0", 2 ,0);
 
+   interrupt(33,0,"Error if this executes \r\n\0",0,0);
    while (1) ;
 }
 
 void printLogo()
 {
-interrupt(33,0,"       ___   `._   ____  _            _    _____   ____   _____ \r\n\0",0);
-interrupt(33,0,"      /   \\__/__> |  _ \\| |          | |  |  __ \\ / __ \\ / ____|\r\n\0",0);
-interrupt(33,0,"     /_  \\  _/    | |_) | | __ _  ___| | _| |  | | |  | | (___ \r\n\0",0);
-interrupt(33,0,"    // \\ /./      |  _ <| |/ _` |/ __| |/ / |  | | |  | |\\___ \\ \r\n\0",0);
-interrupt(33,0,"   //   \\\\        | |_) | | (_| | (__|   <| |__| | |__| |____) |\r\n\0",0);
-interrupt(33,0,"._/'     `\\.      |____/|_|\\__,_|\\___|_|\\_\\_____/ \\____/|_____/\r\n\0",0);
-interrupt(33,0," BlackDOS2020 v. 1.03, c. 2019. Based on a project by M. Black. \r\n\0",0);
-interrupt(33,0," Author(s):Nicole Baldy, Elena Falcione, Tim Inzitari.\r\n\r\n\0",0);
+  interrupt(33,0,"       ___   `._   ____  _            _    _____   ____   _____ \r\n\0",0);
+  interrupt(33,0,"      /   \\__/__> |  _ \\| |          | |  |  __ \\ / __ \\ / ____|\r\n\0",0);
+  interrupt(33,0,"     /_  \\  _/    | |_) | | __ _  ___| | _| |  | | |  | | (___ \r\n\0",0);
+  interrupt(33,0,"    // \\ /./      |  _ <| |/ _` |/ __| |/ / |  | | |  | |\\___ \\ \r\n\0",0);
+  interrupt(33,0,"   //   \\\\        | |_) | | (_| | (__|   <| |__| | |__| |____) |\r\n\0",0);
+  interrupt(33,0,"._/'     `\\.      |____/|_|\\__,_|\\___|_|\\_\\_____/ \\____/|_____/\r\n\0",0);
+  interrupt(33,0," BlackDOS2020 v. 1.03, c. 2019. Based on a project by M. Black. \r\n\0",0);
+  interrupt(33,0," Author(s):Nicole Baldy, Elena Falcione, Tim Inzitari.\r\n\r\n\0",0);
 }
 
 /* MAKE FUTURE UPDATES HERE */
@@ -294,22 +291,17 @@ void clearScreen(int bx, int cx)
 
 }
 
-/* Reads a program from start sector, runs in given segment */
-void runProgram(int start, int size, int segment)
+/* Reads a file from the directory and runs it */
+void runProgram(char* name, int segment)
 {
   /*max size - 26 sectors*/
   char buffer[0x34000];
   int baseSegment;
   int offset;
+  int size;
 
-   if (size > 26)
-   {
-     interrupt(33, 0, "Error: size invalid. Can be no bigger than 26 sectors \0", 0,0);
-     return;
-   }
-
-  /* call readSectors to load file into local buffer */
-  interrupt(33, 2, buffer, start, size);
+  /* call readFile to load file into local buffer */
+  interrupt(33, 3, name, buffer, size);
 
   /* get base location of segment or error if invalid */
   if (segment < 2 || segment > 9) {
@@ -336,9 +328,87 @@ void stop()
   while(1);
 }
 
+void readFile(char* fname, char* buffer, int* size)
+{
+  char directory[512];
+  int i,j, found;
+  /* Load disk directory into memory */
+  interrupt(33, 2, directory, 257, 1);
+
+  /*Loop through 32 possible files */
+  for (i=0; i<32 && directory[16*i] != '\0'; i++)
+  {
+    found = 1; /*use as flag - clear when chars don'tmatch*/
+    for (j=0; j<8 && fname[j]!='\0' ; j++)
+    {
+      if(fname[j] != directory[16*i + j])
+      {
+        found = 0;
+        break;
+      }
+    }
+
+    if(found)
+      break;
+  }
+
+  if (found)
+  {
+    int startPos;
+    startPos = directory[16*i + 8];
+    *size = directory[16*i +9];
+
+    /* read file into buffer */
+    interrupt(33, 2, buffer, startPos, *size);
+    return;
+  }
+
+  /* Not found - throw file not founderror */
+  interrupt(33,15,0,0,0);
+}
+
+
+
+
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
+void error(int bx)
+{
+   switch (bx) {
+	   case 0:
+	   /* error 0 = "File not found." */
+	   interrupt(16, 3654, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
+	   interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
+	   interrupt(16, 3695, 0, 0, 0); interrupt(16, 3700, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
+	   interrupt(16, 3686, 0, 0, 0); interrupt(16, 3695, 0, 0, 0); interrupt(16, 3701, 0, 0, 0);
+	   interrupt(16, 3694, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
+	   break;
+	   case 1:
+	   /* error 1 = "Bad file name." */
+	   interrupt(16, 3650, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
+	   interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0); interrupt(16, 3689, 0, 0, 0);
+	   interrupt(16, 3692, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
+	   interrupt(16, 3694, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3693, 0, 0, 0);
+	   interrupt(16, 3685, 0, 0, 0);
+	   break;
+	   case 2:
+	   /* error 2 = "Disk full." */
+	   interrupt(16, 3652, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3699, 0, 0, 0);
+	   interrupt(16, 3691, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0);
+	   interrupt(16, 3701, 0, 0, 0); interrupt(16, 3692, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
+	   break;
+	   default:
+	   /* default = "General error." */
+	   interrupt(16, 3655, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
+	   interrupt(16, 3685, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3681, 0, 0, 0);
+	   interrupt(16, 3692, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3685, 0, 0, 0);
+	   interrupt(16, 3698, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3695, 0, 0, 0);
+	   interrupt(16, 3698, 0, 0, 0);
+   }
+   interrupt(16, 3630, 0, 0, 0); interrupt(16, 3597, 0, 0, 0); interrupt(16, 3594, 0, 0, 0);
+   interrupt(33, 5, 0, 0, 0);
+}
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
@@ -347,15 +417,16 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
    case 0:  printString(bx, cx); break;
     case 1: readString(bx); break;
     case 2: readSectors(bx,cx,dx); break;
-    /*case 3: case 4:*/
+    case 3: readFile(bx,cx, dx); break;
+    case 4: runProgram(bx, cx); break;
     case 5: stop();
-    case 6:writeSectors(bx,cx,dx); break;
+    case 6: writeSectors(bx,cx,dx); break;
      /*case 7: case 8: case 9: case 10: */
     /*  case 11:*/
     case 12: clearScreen(bx,cx); break;
-     case 13: writeInt(bx,cx); break;
-     case 14: readInt(bx); break;
-     /*case 15: */
-      default: interrupt(33,0,"General BlackDOS error.\r\n\0",0,0);
+    case 13: writeInt(bx,cx); break;
+    case 14: readInt(bx); break;
+    case 15: error(bx); break;
+    default: error(3);
   }
 }
