@@ -25,13 +25,11 @@
 /* 3460:4/526 BlackDOS2020 kernel, Version 1.04, Fall 2019.               */
 
 void handleInterrupt21(int,int,int,int);
-void runProgram(int start, int size, int segment);
 void printLogo();
 
 void main()
 {
    char buffer[512];
-   int size;
    makeInterrupt21();
 
    /* Read sector 258 - config file - into memory */
@@ -40,11 +38,10 @@ void main()
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
    printLogo();
 
-   /* Load msg file */
-   interrupt(33,3,"msg\0",buffer,&size);
-   /* Print msg file */
-   interrupt(33,0,buffer,0,0);
+   /* Run Program */
+   interrupt(33,4,"Stenv\0", 2 ,0);
 
+   interrupt(33,0,"Error if this executes \r\n\0",0,0);
    while (1) ;
 }
 
@@ -294,22 +291,17 @@ void clearScreen(int bx, int cx)
 
 }
 
-/* Reads a program from start sector, runs in given segment */
-void runProgram(int start, int size, int segment)
+/* Reads a file from the directory and runs it */
+void runProgram(char* name, int segment)
 {
   /*max size - 26 sectors*/
   char buffer[0x34000];
   int baseSegment;
   int offset;
+  int size;
 
-   if (size > 26)
-   {
-     interrupt(33, 0, "Error: size invalid. Can be no bigger than 26 sectors \0", 0,0);
-     return;
-   }
-
-  /* call readSectors to load file into local buffer */
-  interrupt(33, 2, buffer, start, size);
+  /* call readFile to load file into local buffer */
+  interrupt(33, 3, name, buffer, size);
 
   /* get base location of segment or error if invalid */
   if (segment < 2 || segment > 9) {
