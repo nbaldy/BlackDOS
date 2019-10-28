@@ -88,7 +88,6 @@ void printFile(char* fileName, int sectorCount, int d)
 	int secondParam;
 	char r;
 	int i;
-  int count = 0;
   int charCount = 512 * sectorCount;
 
   out = 16;
@@ -102,11 +101,10 @@ void printFile(char* fileName, int sectorCount, int d)
   /*print until end of file*/
 	i = 0;
 	r = fileName[0];
-	while (count < charCount)
+	while (i < charCount)
 	{
 	   interrupt(out, secondParam + r, 0,0,0);
 	   r = fileName[++i];
-     ++count;
 	 }
 }
 

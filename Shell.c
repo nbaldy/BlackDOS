@@ -6,7 +6,7 @@ void main()
 {
 
   /* Holds information for parsing commands and config values - note max 512 chars*/
-  char buffer[512], arg1[80], arg2[80];
+  char buffer[512];
   int bgnd, fgnd, cmd;
 
   /* Read config in sector 258 into buffer then save the config variables */
@@ -329,7 +329,7 @@ void senv(char* buffer)
 
 void show(char* buffer)
 {
-  char filename[80];
+  char filename[9]; /*filenames are limited to 8 chars + 1 null terminator*/
   int start = 1; /* skip space */
 
   /* No space - command badly formatted */
@@ -356,15 +356,14 @@ void show(char* buffer)
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
-  /* Command valid */
-  PRINTS("Command: show\r\n\0");
-  PRINTS("Arg 1: \0");
-  PRINTS(filename);
-  PRINTS("\r\n\0");
-
-  WRTESCTR();
-  PRINTFILE(buffer, , 0);
-  PRINTS("\r\n\0");
+  {
+    int size = 0;
+    char contents[0x3400]; //Up to 26 sectors large
+    READFILE(filename, contents, &size)
+    WRTESCTR();
+    PRINTFILE(buffer, , 0);
+    PRINTS("\r\n\0");
+  }
 }
 
 void twet(char* buffer)
