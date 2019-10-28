@@ -236,7 +236,22 @@ void help(char* buffer)
     }
   }
 
-  PRINTS("Command: help\r\n\0");
+  /*PRINTS("Command: help\r\n\0");*/
+
+  PRINTS("\r\nNAME: Shell - a case-sensitive command interpreter that is capable of file and \r\nkeyboard I/O which allows the user to manipulate files, the console display, andthe printer.\r\n\0");
+  PRINTS("\r\nCMD	\t PARAMETERS      DESCRIPTION\r\n\0");
+  PRINTS("boot                  reboot the system\r\n\0");
+  PRINTS("clrs                  clear the screen\r\n\0");
+  PRINTS("echo  comment         display comment on screen followed by a new line\r\n\0");
+  PRINTS("copy	 file1, file2    create file2 and copy all bytes of file1 to file1 without                       deleting file1\r\n\0");
+  PRINTS("ddir                  list directory contents\r\n\0");
+  PRINTS("exec  filename        execute filename\r\n\0");
+  PRINTS("help                  print this user manual\r\n\0");
+  PRINTS("prnt  filename        print contents of filename to printer\r\n\0");
+  PRINTS("remv  filename        delete filename\r\n\0");
+  PRINTS("senv                  set environment variables\r\n\0");
+  PRINTS("show  filename        display contents of filename on console\r\n\0");
+  PRINTS("twet  filename        create a text file called filename\r\n\0");
 }
 
 void prnt(char* buffer)
@@ -361,9 +376,6 @@ void show(char* buffer)
   PRINTS("Arg 1: \0");
   PRINTS(filename);
   PRINTS("\r\n\0");
-
-  WRTESCTR();
-  PRINTFILE(buffer, , 0);
   PRINTS("\r\n\0");
 }
 
