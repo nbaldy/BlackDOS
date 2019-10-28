@@ -172,17 +172,15 @@ void ddir(char* buffer)
   //* Arguments, print warning*/
   if(buffer[0] != '\0')
   {
-    if(buffer[0] == ' ')
-      PRINTS("Warning: Argument provided are ignored.\r\n\0");
-    else
-    { /*attempted 5 char command or mistype*/
+    if(buffer[0] != ' ')
+    {
       PRINTS("ERROR: Badly formatted command\r\n\0");
       return;
     }
   }
 
-
   PRINTS("Command: ddir\r\n\0");
+  RUNPROGRAM("ddir\0", 4);
 }
 
 void exec(char* buffer)
@@ -220,6 +218,8 @@ void exec(char* buffer)
   PRINTS("Arg 1: \0");
   PRINTS(filename);
   PRINTS("\r\n\0");
+
+  RUNPROGRAM(filename, 4);
 }
 
 void help(char* buffer)
@@ -316,16 +316,14 @@ void senv(char* buffer)
   /* Arguments, print warning*/
   if(buffer[0] != '\0')
   {
-    if(buffer[0] == ' ')
-      PRINTS("Warning: Argument provided are ignored. \r\n\0");
-    else
-    { /*attempted 5 char command or mistype*/
+    if(buffer[0] != ' ')
+    {
       PRINTS("ERROR: Badly formatted command\r\n\0");
       return;
     }
   }
 
-
+  RUNPROGRAM("Stenv\0", 4);
   PRINTS("Command: senv\r\n\0");
 }
 
@@ -362,6 +360,10 @@ void show(char* buffer)
   PRINTS("Command: show\r\n\0");
   PRINTS("Arg 1: \0");
   PRINTS(filename);
+  PRINTS("\r\n\0");
+
+  WRTESCTR();
+  PRINTFILE(buffer, , 0);
   PRINTS("\r\n\0");
 }
 

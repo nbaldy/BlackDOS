@@ -29,20 +29,14 @@ void printLogo();
 
 void main()
 {
-   char buffer[512];
-   makeInterrupt21();
-
-   /* Read sector 258 - config file - into memory */
-   interrupt(33,2,buffer,258,1);
-   /* Clear screen */
-   interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
-   printLogo();
-
-   /* Run Program */
-   interrupt(33,4,"Stenv\0", 2 ,0);
-
-   interrupt(33,0,"Error if this executes \r\n\0",0,0);
-   while (1) ;
+  char buffer[512];
+  makeInterrupt21();
+  interrupt(33,2,buffer,258,1);
+  interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
+  printLogo();
+  interrupt(33,4,"Shell\0",2,0);
+  interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);
+  while (1) ;
 }
 
 void printLogo()
@@ -77,13 +71,42 @@ void printString(char* c, int d)
 		secondParam = 0;
 	}
 
-  /*print until null terminator is pressed*/
+  /*print until null terminator is found*/
 	i = 0;
 	r = c[0];
 	while (r != '\0')
 	{
 	   interrupt(out, secondParam + r, 0,0,0);
 	   r= c[++i];
+	 }
+}
+
+/* Prints a file "fileName" with "sectorCount" sectors to console if d = 0 and printer if d = 1*/
+void printFile(char* fileName, int sectorCount, int d)
+{
+  int out;
+	int secondParam;
+	char r;
+	int i;
+  int count = 0;
+  int charCount = 512 * sectorCount;
+
+  out = 16;
+	secondParam = 14 * 256;
+	if (d == 1)
+  {
+		out = 23;
+		secondParam = 0;
+	}
+
+  /*print until end of file*/
+	i = 0;
+	r = fileName[0];
+	while (count < charCount)
+	{
+	   interrupt(out, secondParam + r, 0,0,0);
+	   r = fileName[++i];
+     ++count;
 	 }
 }
 
@@ -227,7 +250,7 @@ readSectors(char *buffer, int sector, int sectorCount)
   headNo = mod(headNo,2);
   trackNo = div(sector,36);
 
-  /* instructs inturrupt to read from sector */
+  /* instructs interrupt to read from sector */
   ax = 512 + sectorCount;
   cx = trackNo * 256 + relSecNo;
   dx = headNo * 256;
@@ -323,11 +346,6 @@ void runProgram(char* name, int segment)
 
 }
 
-void stop()
-{
-  while(1);
-}
-
 void readFile(char* fname, char* buffer, int* size)
 {
   char directory[512];
@@ -363,13 +381,17 @@ void readFile(char* fname, char* buffer, int* size)
     return;
   }
 
-  /* Not found - throw file not founderror */
+  /* Not found - throw file not found error */
   interrupt(33,15,0,0,0);
 }
 
-
-
-
+void stop()
+{
+  char buffer[2];
+  /*interrupt(33, 0, "\r\npress enter to continue\r\n\0", 0, 0);*/
+  interrupt(33, 1, buffer, 0, 0);
+  launchProgram(8192);
+}
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
@@ -419,10 +441,10 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     case 2: readSectors(bx,cx,dx); break;
     case 3: readFile(bx,cx, dx); break;
     case 4: runProgram(bx, cx); break;
-    case 5: stop();
+    case 5: stop(); break;
     case 6: writeSectors(bx,cx,dx); break;
      /*case 7: case 8: case 9: case 10: */
-    /*  case 11:*/
+    case 11: printFile(bx, cx, dx); break;
     case 12: clearScreen(bx,cx); break;
     case 13: writeInt(bx,cx); break;
     case 14: readInt(bx); break;

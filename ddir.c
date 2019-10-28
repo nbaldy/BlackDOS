@@ -7,7 +7,7 @@ int is_capital(char*);
 
 void main()
 {
-   char directory[512], filename[512];
+   char directory[512], filename[512], buffer[2];
    int sectors = 0, sectors_used = 0, i = 0, j = 0, index = 0, num_of_files = 0, noChars;
 
    interrupt(33,2,directory,257,1);
@@ -17,7 +17,7 @@ void main()
 
    while(index < 32)
    {
-      if(directory[i] != 0x0 && index > 0)
+      if(directory[i] != 0x0 && index >= 0)
       {
          noChars = 0;
          for (j = 0; j < 8; j++)
@@ -73,4 +73,3 @@ int is_capital(char* c)
       return 0;
    }
 }
-
