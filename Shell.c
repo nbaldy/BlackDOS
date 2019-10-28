@@ -6,7 +6,7 @@ void main()
 {
 
   /* Holds information for parsing commands and config values - note max 512 chars*/
-  char buffer[512], arg1[80], arg2[80];
+  char buffer[512];
   int bgnd, fgnd, cmd;
 
   /* Read config in sector 258 into buffer then save the config variables */
@@ -256,13 +256,13 @@ void help(char* buffer)
 
 void prnt(char* buffer)
 {
-  char filename[80];
-  int start =1;
+  char filename[9]; /*filenames are limited to 8 chars + 1 null terminator*/
+  int start = 1; /* skip space */
 
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
   {
-    PRINTS("ERROR: Badly formatted command. For Prnt command: prnt filename\r\n\0");
+    PRINTS("ERROR: Badly formatted command. For Show command: show filename\r\n\0");
     return;
   }
 
@@ -272,23 +272,22 @@ void prnt(char* buffer)
   /*empty parameter*/
   if(filename[0] == '\0')
   {
-    PRINTS("ERROR: Prnt takes one parameter: prnt filename\r\n\0");
+    PRINTS("ERROR: Show takes one parameter: show filename\r\n\0");
     return;
   }
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
   {
-    PRINTS("Warning: Prnt requires only one arg: prnt filename\r\n\0");
+    PRINTS("Warning: Show requires only one arg: show filename\r\n\0");
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
-  /* Command valid */
-  PRINTS("Command: prnt\r\n\0");
-  PRINTS("Arg 1: \0");
-  PRINTS(filename);
-  PRINTS("\r\n\0");
+    PRINTFILE(filename, 1);
+    PRINTS("Your note is on the printer, go and get it.\r\n\0");
+
 }
+
 
 void remv(char* buffer)
 {
@@ -344,7 +343,7 @@ void senv(char* buffer)
 
 void show(char* buffer)
 {
-  char filename[80];
+  char filename[9]; /*filenames are limited to 8 chars + 1 null terminator*/
   int start = 1; /* skip space */
 
   /* No space - command badly formatted */
@@ -371,12 +370,9 @@ void show(char* buffer)
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
-  /* Command valid */
-  PRINTS("Command: show\r\n\0");
-  PRINTS("Arg 1: \0");
-  PRINTS(filename);
-  PRINTS("\r\n\0");
-  PRINTS("\r\n\0");
+    PRINTFILE(filename, 0);
+    PRINTS("\r\n\0");
+
 }
 
 void twet(char* buffer)
