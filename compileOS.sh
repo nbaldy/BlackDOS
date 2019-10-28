@@ -18,3 +18,4 @@ ld86 -o cal -d cal.o basm.o
 bcc -ansi -c -o t3.o t3.c
 ld86 -o t3 -d t3.o basm.o
 ./loadFile t3
+./loadFile Stenv

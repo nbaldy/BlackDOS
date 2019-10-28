@@ -1,9 +1,14 @@
 Lab 05 - Operating Systems Nicole Baldy, Elena Falcione, Tim Inzitari
 
 In this lab, we added functionality to our shell - ddir, exec, help, prnt, senv,
-and show were implemented. In compileOS.sh, we compile kernel and shell, and add
-the shell to floppya using loadFile. The shell opens once the operating system
-boots, and then the following commands can be used
+and show were implemented. Run our program using
+  ./compileOS.sh
+and then run our program using
+  echo "c" | bochs -f bdos.txt
+The shell opens once the operating system boots, and then the following commands
+can be used.
+
+Programs already loaded into memory are t3 (a tic tac toe game) and cal (a calender).
 
 
 CMD	PARAMETERS	 DESCRIPTION
@@ -11,7 +16,7 @@ boot			       reboot the system
 clrs			       clear the screen
 echo			       display comment on screen followed by a new line
 	- comment
-copy			       create file2 and copy all bytes of file1 to file1 without deleting file1
+copy			       [Not implemented, print args]
 	- filename1
 	- filename2
 ddir			       list directory contents
