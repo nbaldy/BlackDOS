@@ -11,4 +11,10 @@ dd if=kernel of=floppya.img bs=512 conv=notrunc seek=259
 bcc -ansi -c -o ddir.o ddir.c
 ld86 -o ddir -d ddir.o basm.o
 ./loadFile Shell
-
+./loadFile ddir
+bcc -ansi -c -o cal.o cal.c
+ld86 -o cal -d cal.o basm.o
+./loadFile cal
+bcc -ansi -c -o t3.o t3.c
+ld86 -o t3 -d t3.o basm.o
+./loadFile t3
