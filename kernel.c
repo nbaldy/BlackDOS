@@ -30,7 +30,7 @@ void printLogo();
 
 void main()
 {
-   char buffer[512];
+   char buffer[512], test[3];
    makeInterrupt21();
 
    /* Read sector 258 - config file - into memory */
@@ -39,11 +39,9 @@ void main()
    interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
    printLogo();
 
-   /* fib needs 1 sector, madlibs needs 3 sectors, Stenv needs 4 */
-   /* For now, we're keeping it at the max of 26 sectors so that any program can run*/
-   runProgram(30, 26, 2);
-   interrupt(33,5,0,0,0);
-   interrupt(33,0,"Error if this executes.\r\n\0",0,0);
+   /* Run Shell proram loaded on Sector 30 - assume 11 Sectors or smaller*/
+   runProgram(30, 11, 2);
+   interrupt(33,0,"Bad or missing command interpreter\r\n\0",1,0);
 
    while (1) ;
 }
@@ -349,7 +347,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     case 2: readSectors(bx,cx,dx); break;
     /*case 3: case 4:*/
     case 5: stop();
-    case 6:writeSectors(bx,cx,dx); break;
+    case 6: writeSectors(bx,cx,dx); break;
      /*case 7: case 8: case 9: case 10: */
     /*  case 11:*/
     case 12: clearScreen(bx,cx); break;

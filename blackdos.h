@@ -5,4 +5,6 @@
 #define SCANS(x)   interrupt(33,1,x,0,0)
 #define SCANN(x)   interrupt(33,14,&x,0,0)
 #define CLRSCRN(x,y) interrupt(33,12,x,y,0)
-#define END        interrupt(33,5,0,0,0)
+#define READSCTR(x,y,z) interrupt(33, 2, x,y,z)
+#define REBOOT() interrupt(25,0,0,0,0)
+#define END interrupt(33,5,0,0,0)
