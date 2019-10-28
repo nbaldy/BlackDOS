@@ -10,3 +10,5 @@ ld86 -o Shell -d Shell.o basm.o
 dd if=kernel of=floppya.img bs=512 conv=notrunc seek=259
 bcc -ansi -c -o ddir.o ddir.c
 ld86 -o ddir -d ddir.o basm.o
+./loadFile Shell
+

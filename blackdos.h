@@ -1,6 +1,6 @@
 #define PRINTS(x)  interrupt(33,0,x,0,0)
 #define PRINTN(x)  interrupt(33,13,x,0,0)
-#define PRINTFILE(x, y, z) interrupt(33, 11, x, y, z)
+#define PRINTFILE(x, y) interrupt(33, 11, x, y) /*(char* fileName, int d)*/
 #define LPRINTS(x) interrupt(33,0,x,1,0)
 #define LPRINTN(x) interrupt(33,13,x,1,0)
 #define SCANS(x)   interrupt(33,1,x,0,0)

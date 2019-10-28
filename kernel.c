@@ -81,30 +81,39 @@ void printString(char* c, int d)
 	 }
 }
 
-/* Prints a file "fileName" with "sectorCount" sectors to console if d = 0 and printer if d = 1*/
-void printFile(char* fileName, int sectorCount, int d)
+/* Prints a file "filename" with "sectorCount" sectors to console if d = 0 and printer if d = 1*/
+void printFile(char* filename, int d)
 {
+  char buffer[0x15E00]; /*max file size*/
+  int fileSize;
+  /* ints for printing management */
   int out;
 	int secondParam;
 	char r;
 	int i;
-  int charCount = 512 * sectorCount;
 
-  out = 16;
-	secondParam = 14 * 256;
-	if (d == 1)
+  /*Read file into buffer */
+  interrupt(33, 3, filename, buffer, &fileSize);
+  fileSize = fileSize*512; /*512 bytes per sector*/
+
+  if(d==0)
+  {
+    out = 16;
+  	secondParam = 14 * 256;
+  }
+	else
   {
 		out = 23;
 		secondParam = 0;
 	}
 
-  /*print until end of file*/
+  /*print until null terminator is found*/
 	i = 0;
-	r = fileName[0];
-	while (i < charCount)
+	r = buffer[0];
+	while (i < fileSize)
 	{
 	   interrupt(out, secondParam + r, 0,0,0);
-	   r = fileName[++i];
+	   r= buffer[++i];
 	 }
 }
 
@@ -316,7 +325,7 @@ void clearScreen(int bx, int cx)
 void runProgram(char* name, int segment)
 {
   /*max size - 26 sectors*/
-  char buffer[0x34000];
+  char buffer[0x3400];
   int baseSegment;
   int offset;
   int size;
@@ -442,7 +451,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     case 5: stop(); break;
     case 6: writeSectors(bx,cx,dx); break;
      /*case 7: case 8: case 9: case 10: */
-    case 11: printFile(bx, cx, dx); break;
+    case 11: printFile(bx, cx); break;
     case 12: clearScreen(bx,cx); break;
     case 13: writeInt(bx,cx); break;
     case 14: readInt(bx); break;
