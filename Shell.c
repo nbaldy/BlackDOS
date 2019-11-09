@@ -6,7 +6,7 @@ void main()
 {
 
   /* Holds information for parsing commands and config values - note max 512 chars*/
-  char buffer[512], arg1[80], arg2[80];
+  char buffer[512];
   int bgnd, fgnd, cmd;
 
   /* Read config in sector 258 into buffer then save the config variables */
@@ -172,17 +172,15 @@ void ddir(char* buffer)
   //* Arguments, print warning*/
   if(buffer[0] != '\0')
   {
-    if(buffer[0] == ' ')
-      PRINTS("Warning: Argument provided are ignored.\r\n\0");
-    else
-    { /*attempted 5 char command or mistype*/
+    if(buffer[0] != ' ')
+    {
       PRINTS("ERROR: Badly formatted command\r\n\0");
       return;
     }
   }
 
-
   PRINTS("Command: ddir\r\n\0");
+  RUNPROGRAM("ddir\0", 4);
 }
 
 void exec(char* buffer)
@@ -220,6 +218,8 @@ void exec(char* buffer)
   PRINTS("Arg 1: \0");
   PRINTS(filename);
   PRINTS("\r\n\0");
+
+  RUNPROGRAM(filename, 4);
 }
 
 void help(char* buffer)
@@ -236,18 +236,33 @@ void help(char* buffer)
     }
   }
 
-  PRINTS("Command: help\r\n\0");
+  /*PRINTS("Command: help\r\n\0");*/
+
+  PRINTS("\r\nNAME: Shell - a case-sensitive command interpreter that is capable of file and \r\nkeyboard I/O which allows the user to manipulate files, the console display, andthe printer.\r\n\0");
+  PRINTS("\r\nCMD	\t PARAMETERS      DESCRIPTION\r\n\0");
+  PRINTS("boot                  reboot the system\r\n\0");
+  PRINTS("clrs                  clear the screen\r\n\0");
+  PRINTS("echo  comment         display comment on screen followed by a new line\r\n\0");
+  PRINTS("copy	 file1, file2    create file2 and copy all bytes of file1 to file1 without                       deleting file1\r\n\0");
+  PRINTS("ddir                  list directory contents\r\n\0");
+  PRINTS("exec  filename        execute filename\r\n\0");
+  PRINTS("help                  print this user manual\r\n\0");
+  PRINTS("prnt  filename        print contents of filename to printer\r\n\0");
+  PRINTS("remv  filename        delete filename\r\n\0");
+  PRINTS("senv                  set environment variables\r\n\0");
+  PRINTS("show  filename        display contents of filename on console\r\n\0");
+  PRINTS("twet  filename        create a text file called filename\r\n\0");
 }
 
 void prnt(char* buffer)
 {
-  char filename[80];
-  int start =1;
+  char filename[9]; /*filenames are limited to 8 chars + 1 null terminator*/
+  int start = 1; /* skip space */
 
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
   {
-    PRINTS("ERROR: Badly formatted command. For Prnt command: prnt filename\r\n\0");
+    PRINTS("ERROR: Badly formatted command. For Show command: show filename\r\n\0");
     return;
   }
 
@@ -257,23 +272,22 @@ void prnt(char* buffer)
   /*empty parameter*/
   if(filename[0] == '\0')
   {
-    PRINTS("ERROR: Prnt takes one parameter: prnt filename\r\n\0");
+    PRINTS("ERROR: Show takes one parameter: show filename\r\n\0");
     return;
   }
 
   /* Second argument provided - badly formatted command */
   if(buffer[start] == ' ')
   {
-    PRINTS("Warning: Prnt requires only one arg: prnt filename\r\n\0");
+    PRINTS("Warning: Show requires only one arg: show filename\r\n\0");
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
-  /* Command valid */
-  PRINTS("Command: prnt\r\n\0");
-  PRINTS("Arg 1: \0");
-  PRINTS(filename);
-  PRINTS("\r\n\0");
+    PRINTFILE(filename, 1);
+    PRINTS("Your note is on the printer, go and get it.\r\n\0");
+
 }
+
 
 void remv(char* buffer)
 {
@@ -316,22 +330,20 @@ void senv(char* buffer)
   /* Arguments, print warning*/
   if(buffer[0] != '\0')
   {
-    if(buffer[0] == ' ')
-      PRINTS("Warning: Argument provided are ignored. \r\n\0");
-    else
-    { /*attempted 5 char command or mistype*/
+    if(buffer[0] != ' ')
+    {
       PRINTS("ERROR: Badly formatted command\r\n\0");
       return;
     }
   }
 
-
+  RUNPROGRAM("Stenv\0", 4);
   PRINTS("Command: senv\r\n\0");
 }
 
 void show(char* buffer)
 {
-  char filename[80];
+  char filename[9]; /*filenames are limited to 8 chars + 1 null terminator*/
   int start = 1; /* skip space */
 
   /* No space - command badly formatted */
@@ -358,11 +370,9 @@ void show(char* buffer)
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
-  /* Command valid */
-  PRINTS("Command: show\r\n\0");
-  PRINTS("Arg 1: \0");
-  PRINTS(filename);
-  PRINTS("\r\n\0");
+    PRINTFILE(filename, 0);
+    PRINTS("\r\n\0");
+
 }
 
 void twet(char* buffer)

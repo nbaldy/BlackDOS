@@ -1,23 +1,34 @@
 Lab 05 - Operating Systems Nicole Baldy, Elena Falcione, Tim Inzitari
 
-In this lab, we created a basic shell with three working functions: boot, clrs,
-and echo. Boot is called with no arguments and reboots the operating system,
-clrs also takes no arguments and clears the screen, and echo prints its argument
-(comment) to the screen. We also created the 9 stub functions specified in the
-lab, which print the command and the arguments provided. All commands issue
-warnings if extra arguments are provided and show helpful tips if you do not
-provide enough arguments
+In this lab, we added functionality to our shell - ddir, exec, help, prnt, senv,
+and show were implemented. Run our program using
+  ./compileOS.sh
+and then run our program using
+  echo "c" | bochs -f bdos.txt
+The shell opens once the operating system boots, and then the following commands
+can be used.
 
-Our shell program is 11 segments so compileOS.sh and kernel.c have been modified
-to accommodate this.
+Programs already loaded into memory are t3 (a tic tac toe game) and cal (a calender).
 
-The very first time our program is run, bootload must be compiled by executing
-the command
-   "nasm bootload.asm"
-To compile the operating system, use
-	 "./compileOS.sh" (will need exe privileges)
-Run the operating system using
-   "echo "c" | bochs -f bdos.txt"
-The shell should automatically pop up, and the user can begin entering any of
-the 12 commands we implemented or created stub functions for in this lab.
-[boot, clrs, echo, copy, ddir, exec, help, prnt, remv, senv, show, twet]
+
+CMD	PARAMETERS	 DESCRIPTION
+boot			       reboot the system
+clrs			       clear the screen
+echo			       display comment on screen followed by a new line
+	- comment
+copy			       [Not implemented, print args]
+	- filename1
+	- filename2
+ddir			       list directory contents
+exec			       execute filename
+	- filename
+help			       display this user manual
+prnt			       print contents of filename to printer
+	- filename
+remv			       [Not implemented, print args]
+	- filename
+senv			       set environment variables
+show			       display contents of filename in console
+	- filename
+twet			       [Not implemented, print args]
+	- filename
