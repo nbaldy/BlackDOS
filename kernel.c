@@ -19,7 +19,7 @@
 /*                                                                        */
 /*                                                                        */
 /*                                                                        */
-/* Signed:_______ Nicole Baldy, Elaine Falcione, Tim Inzitari_______ Date:______9/19/19_______        */
+/* Signed:_______ Nicole Baldy, Elena Falcione, Tim Inzitari_______ Date:______9/19/19_______        */
 /*                                                                        */
 /*                                                                        */
 /* 3460:4/526 BlackDOS2020 kernel, Version 1.04, Fall 2019.               */
@@ -301,6 +301,27 @@ writeSectors(char *buffer, int sector, int sectorCount)
 
 }
 
+void deleteFile(char* name)
+{
+  int i = 0; /*index for searching directory*/
+  char directory[512], map[512];
+
+  /* Load disk directory and map into memory */
+  interrupt(33, 2, directory, 257, 1);
+  interrupt(33, 2, map, 256, 1);
+
+  /*need to step through directory looking for filename
+  set first byte of file name to zero
+  set map bytes corresponding to file's sectors to zero*/
+
+  /*write directory and map back to disk*/
+  interrupt(33, 6, directory, 257, 1);
+  interrupt(33, 6, map, 256, 1);
+
+  /*error, file not found*/
+  interrupt(33, 15, 0, 0, 0);
+}
+
 /* bx = background color, cx = character color, and clear screen */
 void clearScreen(int bx, int cx)
 {
@@ -522,7 +543,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     case 4: runProgram(bx, cx); break;
     case 5: stop(); break;
     case 6: writeSectors(bx,cx,dx); break;
-    /*case 7: deleteFile(bx); break;*/
+    case 7: deleteFile(bx); break;
     case 8: writeFile(bx,cx,dx); break;
     /* case 9: case 10: */
     case 11: printFile(bx, cx); break;
