@@ -34,6 +34,7 @@ void main()
   interrupt(33,2,buffer,258,1);
   interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
   printLogo();
+  interrupt(33, 8, "test\0", buffer, 1);
   interrupt(33,4,"Shell\0",2,0);
   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);
   while (1) ;
@@ -400,6 +401,77 @@ void stop()
   launchProgram(8192);
 }
 
+void writeFile(char* name, char* buffer, int numSectors)
+{
+  int dirIndex, sector, j, empty=-1;
+  char directory[512], map[512];
+
+
+  /* Load disk directory and map into memory */
+  interrupt(33, 2, directory, 257, 1);
+  interrupt(33, 2, map, 256, 1);
+
+
+  /*Loop through 32 possible files */
+  for (dirIndex=0; dirIndex<512; dirIndex+=16)
+  {
+    /* save first empty slot */
+    if (directory[dirIndex] == '\0' && empty == -1)
+      empty = dirIndex;
+
+    /* check other directory contents to ensure name is unique */
+    j = 0;
+    for(j=0; j<8 && name[j] == directory[dirIndex+j]; j++);
+
+    /*got to end of filename - already exists, throw error */
+    if (name[j] == 0)
+      interrupt(33, 15, 1, 0, 0);
+  }
+
+  /* no empty spaces */
+  if(empty < 0)
+    interrupt(33, 15, 2,0,0);
+
+  /* copy filename to directory */
+  for (j=0; j<8 && name[j] != '\0'; j++)
+    directory[dirIndex+j] = name[j];
+
+  /* fill in remaining spaces with 0s */
+  for (; j<8; j++)
+    directory[dirIndex+j] = '\0';
+
+  /* find space for file in map */
+  for (sector=1; sector<=512-numSectors; sector++)
+  {
+    for(j=0; j<numSectors && map[sector+j]==0; j++);
+    /*found enough empty sectors*/
+    if (j==numSectors) break;
+  }
+
+  /* not enough space left in map, throw error */
+  if(sector>512-numSectors)
+    interrupt(33, 15, 1, 0, 0);
+
+  /* Reserve space in memory */
+  for(j=0; j<numSectors; j++)
+    map[sector+j] = -1;
+
+  directory[dirIndex+8] = sector;
+  directory[dirIndex+9] = numSectors;
+
+  printString("writing file\0",0);
+
+  /* Write file to disk */
+  interrupt(33, 6, buffer, sector, numSectors);
+  /* Write modified map and directory to disk */
+
+  printString("writing dir, map\0",0);
+
+  interrupt(33, 6, directory, 257, 1);
+  interrupt(33, 6, map, 256, 1);
+
+}
+
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
 void error(int bx)
@@ -450,7 +522,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     case 4: runProgram(bx, cx); break;
     case 5: stop(); break;
     case 6: writeSectors(bx,cx,dx); break;
-     /*case 7: case 8: case 9: case 10: */
+    /*case 7: deleteFile(bx); break;*/
+    case 8: writeFile(bx,cx,dx); break;
+    /* case 9: case 10: */
     case 11: printFile(bx, cx); break;
     case 12: clearScreen(bx,cx); break;
     case 13: writeInt(bx,cx); break;

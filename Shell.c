@@ -16,7 +16,7 @@ void main()
   fgnd = buffer[1]-'0'+1;
 
   /* Clear screen and print welcome */
-  CLRSCRN(bgnd,fgnd);
+  /*CLRSCRN(bgnd,fgnd);*/
   PRINTS("Welcome to the Shell!\r\n\0");
 
   /* Start Shell UI*/
