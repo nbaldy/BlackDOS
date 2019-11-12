@@ -19,7 +19,7 @@
 /*                                                                        */
 /*                                                                        */
 /*                                                                        */
-/* Signed:_______ Nicole Baldy, Elaine Falcione, Tim Inzitari_______ Date:______9/19/19_______        */
+/* Signed:_______ Nicole Baldy, Elena Falcione, Tim Inzitari_______ Date:______9/19/19_______        */
 /*                                                                        */
 /*                                                                        */
 /* 3460:4/526 BlackDOS2020 kernel, Version 1.04, Fall 2019.               */
@@ -301,6 +301,48 @@ writeSectors(char *buffer, int sector, int sectorCount)
 
 }
 
+void deleteFile(char* name)
+{
+  int dirIndex = 0; /*index for traversing directory*/
+  int mapIndex = 0; /*index for traversing map*/
+  char directory[512], map[512];
+
+  /* Load disk directory and map into memory */
+  interrupt(33, 2, directory, 257, 1);
+  interrupt(33, 2, map, 256, 1);
+
+  /*Loop through 32 possible files */
+  for (dirIndex = 0; dirIndex < 512; dirIndex += 16)
+  {
+    /* locate file */
+    if (directory[dirIndex] == name)
+    {
+      directory[dirIndex+8] = sector;
+      directory[dirIndex+9] = numSectors;
+      directory[dirIndex] == 0;
+
+      /* set map bytes corresponding to file's sectors to zero*/
+      for(mapIndex = 0; mapIndex < numSectors; ++mapIndex)
+      {
+        map[sector + mapIndex] = 0;
+      }
+
+      /*write directory and map back to disk*/
+      interrupt(33, 6, directory, 257, 1);
+      interrupt(33, 6, map, 256, 1);
+
+      return;
+    }
+  }
+  /*error, file not found*/
+  interrupt(33, 15, 0, 0, 0);
+
+  /*write directory and map back to disk. is this needed?
+  would we ever even get here?
+  interrupt(33, 6, directory, 257, 1);
+  interrupt(33, 6, map, 256, 1);*/
+}
+
 /* bx = background color, cx = character color, and clear screen */
 void clearScreen(int bx, int cx)
 {
@@ -522,7 +564,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     case 4: runProgram(bx, cx); break;
     case 5: stop(); break;
     case 6: writeSectors(bx,cx,dx); break;
-    /*case 7: deleteFile(bx); break;*/
+    case 7: deleteFile(bx); break;
     case 8: writeFile(bx,cx,dx); break;
     /* case 9: case 10: */
     case 11: printFile(bx, cx); break;
