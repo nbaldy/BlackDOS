@@ -10,13 +10,6 @@ void main()
   int bgnd, fgnd, cmd;
 
   /* Read config in sector 258 into buffer then save the config variables */
-  READSCTR(buffer, 258, 1);
-
-  bgnd = buffer[0]-'0'+1;
-  fgnd = buffer[1]-'0'+1;
-
-  /* Clear screen and print welcome */
-  /*CLRSCRN(bgnd,fgnd);*/
   PRINTS("Welcome to the Shell!\r\n\0");
 
   /* Start Shell UI*/
