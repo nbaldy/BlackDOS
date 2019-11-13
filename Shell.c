@@ -7,10 +7,6 @@ void main()
 
   /* Holds information for parsing commands and config values - note max 512 chars*/
   char buffer[512];
-  int bgnd, fgnd, cmd;
-
-  /* Read config in sector 258 into buffer then save the config variables */
-  PRINTS("Welcome to the Shell!\r\n\0");
 
   /* Start Shell UI*/
   while(1)

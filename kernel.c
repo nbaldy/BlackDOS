@@ -29,11 +29,11 @@ void printLogo();
 
 void main() {
   char buffer[512];
+
   makeInterrupt21();
   interrupt(33,2,buffer,258,1);
   interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
   printLogo();
-  interrupt(33, 8, "test\0", buffer, 1);
   interrupt(33,4,"Shell\0",2,0);
   interrupt(33,0,"Bad or missing command interpreter.\r\n\0",0,0);
   while (1) ;
@@ -102,7 +102,7 @@ void printFile(char* filename, int d) {
 		secondParam = 0;
 	}
 
-  /*print until null terminator is found*/
+  /*print until end of file*/
 	i = 0;
 	r = buffer[0];
 	while (i < fileSize) {
@@ -213,7 +213,7 @@ void intToStr (int num, char* str) {
 
 /* use intToStr and printString to write an integer to the console or printer*/
 void writeInt(int num, int out) {
-  char* str[6];
+  char str[6];
   intToStr(num,str);
   interrupt(33,0, str, out,0);
 }
@@ -290,8 +290,7 @@ void writeFile(char* name, char* buffer, int numSectors) {
   int empty = -1; /* index of first empty directory entry */
   int j; /*loop through filenames*/
   char directory[512], map[512];
-
-  printString("entering writeFile\0",0);
+  printString(name,0);
 
   /* Load disk directory and map into memory */
   interrupt(33, 2, directory, 257, 1);
@@ -303,15 +302,13 @@ void writeFile(char* name, char* buffer, int numSectors) {
     /* save first empty slot */
     if (!directory[dirIndex] && empty < 0) {
       empty = dirIndex;
-      printString("Empty at \0",0);
-      writeInt(empty);
     }
 
     /* check other directory contents to ensure name is unique */
-    for (j=0; j<8 && name[j] == directory[dirIndex+j]; j++) {}
+    for (j=0; name[j] != '\0' && name[j] == directory[dirIndex+j]; j++) {}
 
-    /*got to end of filename - already exists, throw error */
-    if (j==8) {
+    /*Filename match - already exists, throw error */
+    if (name[j]==0 && directory[j] == 0) {
       interrupt(33, 15, 1, 0, 0);
       return;
     }
@@ -326,7 +323,8 @@ void writeFile(char* name, char* buffer, int numSectors) {
 
   /* copy filename to directory */
   for (j=0; j<8; j++) {
-    directory[dirIndex+j] = name[j];
+    directory[empty+j] = name[j];
+    interrupt(16, 14 * 256 + directory[empty+j], 0,0,0);
   }
 
   /* find space for file in map */
@@ -335,6 +333,7 @@ void writeFile(char* name, char* buffer, int numSectors) {
 
     /*found enough empty sectors*/
     if (j==numSectors) { break; }
+
     /* otherwise skip sectors already checked */
     sector = sector+j+1;
   }
@@ -350,17 +349,13 @@ void writeFile(char* name, char* buffer, int numSectors) {
     map[sector+j] = -1;
   }
 
-  directory[dirIndex+8] = sector;
-  directory[dirIndex+9] = numSectors;
-
-  printString("\r\nwriting file at \0",0);
-  writeInt(sector);
+  directory[empty+8] = sector;
+  directory[empty+9] = numSectors;
 
   /* Write file to disk */
   interrupt(33, 6, buffer, sector, numSectors);
 
   /* Write modified map and directory to disk */
-  printString("writing dir, map\0",0);
   interrupt(33, 6, directory, 257, 1);
   interrupt(33, 6, map, 256, 1);
 
@@ -379,12 +374,11 @@ void deleteFile(char* name) {
 
   /*Loop through 32 possible files */
   for (dirIndex = 0; dirIndex < 512; dirIndex += 16) {
-
     /* Try to match filename */
-    for (j=0; j<8 && name[j] == directory[dirIndex+j]; j++) {}
+    for (j=0; name[j] != '\0' && name[j] == directory[dirIndex+j]; j++) {}
 
     /* got to end of filename - filenames match */
-    if (j==8) {
+    if (name[j]==0 && directory[j] == 0) {
       /* save sector information for map before deleting */
       sector = directory[dirIndex+8];
       numSectors = directory[dirIndex+9];
