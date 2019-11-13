@@ -120,7 +120,9 @@ void clrs()
 void copy(char* buffer)
 {
   char file1[80], file2[80];
+  char tem[80];
   int start = 1; /* skip space */
+  int temp = 2;
 
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
@@ -149,6 +151,8 @@ void copy(char* buffer)
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
+  interrupt(33, 3, file1, tem, temp);
+  interrupt(33,8, file2, tem, temp;
   /* Command valid */
   PRINTS("Command: copy\r\n\0");
   PRINTS("Arg 1: \0");
@@ -157,6 +161,11 @@ void copy(char* buffer)
   PRINTS("Arg 2: \0");
   PRINTS(file2);
   PRINTS("\r\n\0");
+
+  // read file to buffer
+  // don't know how many sectors to get so just using temp
+
+  
 
 }
 
@@ -372,6 +381,10 @@ void twet(char* buffer)
 {
   char filename[80];
   int start = 1; /* skip space */
+  char text[140];
+
+   // gather text
+  text = "test";
 
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
@@ -398,6 +411,8 @@ void twet(char* buffer)
   }
 
   /* Command valid */
+  interrupt(33,15, filename, text, 2);
+
   PRINTS("Command: twet\r\n\0");
   PRINTS("Arg 1: \0");
   PRINTS(filename);
