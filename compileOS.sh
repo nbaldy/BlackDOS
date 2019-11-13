@@ -12,13 +12,6 @@ bcc -ansi -c -o ddir.o ddir.c
 ld86 -o ddir -d ddir.o basm.o
 ./loadFile Shell
 ./loadFile ddir
-bcc -ansi -c -o cal.o cal.c
-ld86 -o cal -d cal.o basm.o
-./loadFile cal
-bcc -ansi -c -o t3.o t3.c
-ld86 -o t3 -d t3.o basm.o
-./loadFile t3
-./loadFile Stenv
 bcc -ansi -c -o lab7.o lab7.c
 ld86 -o lab7 -d lab7.o basm.o
 ./loadFile lab7

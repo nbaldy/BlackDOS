@@ -215,7 +215,7 @@ void intToStr (int num, char* str) {
 void writeInt(int num, int out) {
   char str[6];
   intToStr(num,str);
-  interrupt(33,0, str, out,0);
+  interrupt(33,0, str, out, 0);
 }
 
 /* Takes absolute sector, calculates and reads relative sector into buffer */
@@ -290,7 +290,6 @@ void writeFile(char* name, char* buffer, int numSectors) {
   int empty = -1; /* index of first empty directory entry */
   int j; /*loop through filenames*/
   char directory[512], map[512];
-  printString(name,0);
 
   /* Load disk directory and map into memory */
   interrupt(33, 2, directory, 257, 1);
@@ -304,27 +303,21 @@ void writeFile(char* name, char* buffer, int numSectors) {
       empty = dirIndex;
     }
 
-    /* check other directory contents to ensure name is unique */
-    for (j=0; name[j] != '\0' && name[j] == directory[dirIndex+j]; j++) {}
+      /* check other directory contents to ensure name is unique */
+      for (j=0; j<8 && name[j] != '\0' && name[j] == directory[dirIndex+j]; j++) {}
 
-    /*Filename match - already exists, throw error */
-    if (name[j]==0 && directory[j] == 0) {
-      interrupt(33, 15, 1, 0, 0);
-      return;
-    }
-
+      /*Filename match - already exists, throw error */
+      if (j==8 || (!name[j] && !directory[dirIndex+j]))
+      {
+        interrupt(33, 15, 1, 0, 0);
+        return;
+      }
   }
 
   /* no empty space left in directory - error */
   if(empty < 0) {
     interrupt(33, 15, 2,0,0);
     return;
-  }
-
-  /* copy filename to directory */
-  for (j=0; j<8; j++) {
-    directory[empty+j] = name[j];
-    interrupt(16, 14 * 256 + directory[empty+j], 0,0,0);
   }
 
   /* find space for file in map */
@@ -349,6 +342,10 @@ void writeFile(char* name, char* buffer, int numSectors) {
     map[sector+j] = -1;
   }
 
+/* copy filename to directory */
+  for (j=0; j<8; j++) {
+    directory[empty+j] = name[j];
+  }
   directory[empty+8] = sector;
   directory[empty+9] = numSectors;
 
