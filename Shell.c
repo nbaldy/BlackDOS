@@ -7,17 +7,8 @@ void main()
 
   /* Holds information for parsing commands and config values - note max 512 chars*/
   char buffer[512];
-  int bgnd, fgnd, cmd;
-
-  /* Read config in sector 258 into buffer then save the config variables */
-  READSCTR(buffer, 258, 1);
-
-  bgnd = buffer[0]-'0'+1;
-  fgnd = buffer[1]-'0'+1;
-
-  /* Clear screen and print welcome */
-  CLRSCRN(bgnd,fgnd);
-  PRINTS("Welcome to the Shell!\r\n\0");
+  int i;
+  for(i=0; i<512;i++) buffer[i] = 0;
 
   /* Start Shell UI*/
   while(1)
@@ -37,12 +28,7 @@ int compare(char *c1, char *c2, int size)
 
   for(i = 0; i < size; i++)
   {
-
-    if(c1[i] != c2[i])
-    {
-      return 0;
-    }
-
+    if(c1[i] != c2[i]) { return 0; }
   }
   return 1;
 }
@@ -121,13 +107,12 @@ void clrs()
   return;
 }
 
-
-/***** Stub Commands follow *****/
-
 void copy(char* buffer)
 {
   char file1[80], file2[80];
+  char contents[12288];
   int start = 1; /* skip space */
+  int size = -1;
 
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
@@ -148,7 +133,6 @@ void copy(char* buffer)
     return;
   }
 
-
   /* Third argument provided - badly formatted command */
   if(buffer[start] == ' ')
   {
@@ -156,20 +140,14 @@ void copy(char* buffer)
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
-  /* Command valid */
-  PRINTS("Command: copy\r\n\0");
-  PRINTS("Arg 1: \0");
-  PRINTS(file1);
-  PRINTS("\r\n\0");
-  PRINTS("Arg 2: \0");
-  PRINTS(file2);
-  PRINTS("\r\n\0");
-
+  /* Write contents from 1 filename to another */
+  READFILE(file1, contents, &size);
+  WRITEFILE(file2, contents, size);
 }
 
 void ddir(char* buffer)
 {
-  //* Arguments, print warning*/
+  /* Arguments, print warning*/
   if(buffer[0] != '\0')
   {
     if(buffer[0] != ' ')
@@ -319,10 +297,7 @@ void remv(char* buffer)
   }
 
   /* Command valid */
-  PRINTS("Command: remv\r\n\0");
-  PRINTS("Arg 1: \0");
-  PRINTS(filename);
-  PRINTS("\r\n\0");
+  DELFILE(filename);
 }
 
 void senv(char* buffer)
@@ -378,7 +353,11 @@ void show(char* buffer)
 void twet(char* buffer)
 {
   char filename[80];
-  int start = 1; /* skip space */
+  int start = 1; /* unpack buffer - skip space */
+  char text[512];
+  int i; /* Iterate through strings*/
+  /* create buffer of null chars in text */
+  for(i=0; i<512; i++) { text[i]=0; }
 
   /* No space - command badly formatted */
   if(buffer[0] != ' ')
@@ -389,7 +368,6 @@ void twet(char* buffer)
 
   /* Get file1 */
   start +=readToChar(&buffer[start], ' ', filename);
-
   /*empty parameter*/
   if(filename[0] == '\0')
   {
@@ -405,10 +383,18 @@ void twet(char* buffer)
   }
 
   /* Command valid */
-  PRINTS("Command: twet\r\n\0");
-  PRINTS("Arg 1: \0");
-  PRINTS(filename);
-  PRINTS("\r\n\0");
+  /* Command valid - read text*/
+  PRINTS("\r\nEnter text (140 char max) >> \0");
+  SCANS(text);
+
+  /* too many characters */
+  if(text[140])
+  {
+    PRINTS("Too many characters!\0");
+    interrupt(33,15, filename, text, 2);
+    return;
+  }
+  WRITEFILE(filename, text,1);
 }
 
 /* Do the work - take buffer and parse it into commands,

@@ -31,6 +31,7 @@ void main()
 
          if(is_capital(filename[0]))
          {
+           num_of_files++;
          }
          else
          {
