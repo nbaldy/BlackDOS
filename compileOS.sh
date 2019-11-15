@@ -16,3 +16,4 @@ bcc -ansi -c -o lab7.o lab7.c
 ld86 -o lab7 -d lab7.o basm.o
 ./loadFile lab7
 ./loadFile fpc02
+./loadFile Stenv

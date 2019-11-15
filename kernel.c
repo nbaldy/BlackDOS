@@ -53,7 +53,18 @@ void printLogo() {
 /* MAKE FUTURE UPDATES HERE */
 /* VVVVVVVVVVVVVVVVVVVVVVVV */
 
-
+/* check if the first letter of the file is capital */
+int is_capital(char c)
+{
+   if(c >= 'A' && c <= 'Z')
+   {
+      return 1;
+   }
+   else
+   {
+      return 0;
+   }
+}
 
 /* Prints a string to either the console (if d=0) or printer (d=1) */
 void printString(char* c, int d) {
@@ -291,6 +302,12 @@ void writeFile(char* name, char* buffer, int numSectors) {
   int j; /*loop through filenames*/
   char directory[512], map[512];
 
+  /* illegal to save file beginning with a capital letter - these are reserved for OS files*/
+  if(is_capital(name[0]))
+  {
+    interrupt(33,15,1,0,0);
+  }
+
   /* Load disk directory and map into memory */
   interrupt(33, 2, directory, 257, 1);
   interrupt(33, 2, map, 256, 1);
@@ -309,14 +326,12 @@ void writeFile(char* name, char* buffer, int numSectors) {
       if (j==8 || (!name[j] && !directory[dirIndex+j]))
       {
         interrupt(33, 15, 1, 0, 0);
-        return;
       }
   }
 
   /* no empty space left in directory - error */
   if(empty < 0) {
     interrupt(33, 15, 2,0,0);
-    return;
   }
 
   /* find space for file in map */
@@ -333,7 +348,6 @@ void writeFile(char* name, char* buffer, int numSectors) {
   /* not enough space left in map, throw error */
   if(sector>512-numSectors) {
     interrupt(33, 15, 1, 0, 0);
-    return;
   }
 
   /* Reserve space in memory */
@@ -363,6 +377,13 @@ void deleteFile(char* name) {
   int numSectors; /* length of file */
   int j; /* loop through filenames */
   char directory[512], map[512];
+
+  /* illegal to delete file beginning with a capital letter - these are reserved for OS files*/
+  if(is_capital(name[0]))
+  {
+    interrupt(33,15,1,0,0);
+  }
+
 
   /* Load disk directory and map into memory */
   interrupt(33, 2, directory, 257, 1);

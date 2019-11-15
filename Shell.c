@@ -157,7 +157,6 @@ void ddir(char* buffer)
     }
   }
 
-  PRINTS("Command: ddir\r\n\0");
   RUNPROGRAM("ddir\0", 4);
 }
 
@@ -191,12 +190,6 @@ void exec(char* buffer)
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
-  /* Command valid */
-  PRINTS("Command: exec\r\n\0");
-  PRINTS("Arg 1: \0");
-  PRINTS(filename);
-  PRINTS("\r\n\0");
-
   RUNPROGRAM(filename, 4);
 }
 
@@ -213,8 +206,6 @@ void help(char* buffer)
       return;
     }
   }
-
-  /*PRINTS("Command: help\r\n\0");*/
 
   PRINTS("\r\nNAME: Shell - a case-sensitive command interpreter that is capable of file and \r\nkeyboard I/O which allows the user to manipulate files, the console display, andthe printer.\r\n\0");
   PRINTS("\r\nCMD	\t PARAMETERS      DESCRIPTION\r\n\0");
@@ -313,7 +304,6 @@ void senv(char* buffer)
   }
 
   RUNPROGRAM("Stenv\0", 4);
-  PRINTS("Command: senv\r\n\0");
 }
 
 void show(char* buffer)
@@ -382,7 +372,6 @@ void twet(char* buffer)
     PRINTS("Extra arguments ignored\r\n\0");
   }
 
-  /* Command valid */
   /* Command valid - read text*/
   PRINTS("\r\nEnter text (140 char max) >> \0");
   SCANS(text);
@@ -390,7 +379,7 @@ void twet(char* buffer)
   /* too many characters */
   if(text[140])
   {
-    PRINTS("Too many characters!\0");
+    PRINTS("Too many characters!\r\n\0");
     interrupt(33,15, filename, text, 2);
     return;
   }
