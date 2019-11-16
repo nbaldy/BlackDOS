@@ -9,11 +9,11 @@ as86 blackdos.asm -o basm.o
 ld86 -o Shell -d Shell.o basm.o
 dd if=kernel of=floppya.img bs=512 conv=notrunc seek=259
 bcc -ansi -c -o ddir.o ddir.c
-ld86 -o ddir -d ddir.o basm.o
+ld86 -o Ddir -d ddir.o basm.o
 ./loadFile Shell
-./loadFile ddir
+./loadFile Ddir
+./loadFile Stenv
 bcc -ansi -c -o lab7.o lab7.c
 ld86 -o lab7 -d lab7.o basm.o
 ./loadFile lab7
 ./loadFile fpc02
-./loadFile Stenv

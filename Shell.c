@@ -157,7 +157,7 @@ void ddir(char* buffer)
     }
   }
 
-  RUNPROGRAM("ddir\0", 4);
+  RUNPROGRAM("Ddir\0", 4);
 }
 
 void exec(char* buffer)
