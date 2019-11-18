@@ -54,6 +54,18 @@ struct command_t {
 int parseCommand(char *, struct command_t *);
 void printPrompt();
 void readCommand(char *);
+void copy(char* buffer);
+void delete(char* buffer);
+void echo(char* buffer);
+void help(char* buffer);
+void list(char* buffer);
+void make(char* buffer);
+void printFile(char* buffer);
+void quitShell(char* buffer);
+void surf(char* buffer);
+void wipe(char* buffer);
+void exec(char* buffer);
+
 
 int main(int argc, char *argv[]) {
    int pid;
@@ -193,7 +205,7 @@ X program
 */
 void exec(char* buffer)
 {
-  
+
 }
 
 /* Parse Command function */
