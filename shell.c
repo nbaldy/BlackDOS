@@ -86,6 +86,116 @@ int main(int argc, char *argv[]) {
 
 /* End basic shell */
 
+
+
+/* Copy Shell function */
+// called with  
+// C file1 file2
+void copy(char* buffer)
+{
+
+}
+
+/*
+Delete Shell Function
+called with
+D file
+*/
+void delete(char* buffer)
+{
+
+}
+
+/*
+Echo shell function
+called with
+E comment
+*/
+void echo(char* buffer)
+{
+
+}
+
+/* 
+Help Shell Function
+Called with
+H
+*/
+void help(char* buffer)
+{
+
+}
+
+/*
+List Contents Function
+Called with
+L
+*/
+void list(char* buffer)
+{
+
+}
+
+/*
+Make File Function
+Called with
+M file
+*/
+void make(char* buffer)
+{
+
+}
+
+/*
+Print File Function
+called with
+P file
+*/
+void printFile(char* buffer)
+{
+
+}
+
+/*
+Quit Shell Function
+called with
+Q
+*/
+void quitShell(char* buffer)
+{
+
+}
+
+/* 
+Surf web function
+called with
+S
+*/
+void surf(char* buffer)
+{
+
+}
+
+/*
+Wipe function
+called with
+W
+*/
+void wipe(char* buffer)
+{
+
+}
+
+/* 
+Execute Program Function
+called with
+X program
+*/
+void exec(char* buffer)
+{
+  
+}
+
 /* Parse Command function */
 
 /* Determine command name and construct the parameter list.
