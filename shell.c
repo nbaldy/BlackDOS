@@ -19,7 +19,7 @@
 //
 //
 //
-// Signed:_____________________________________ Date:_____________
+// Signed:Nicole Baldy, Elaine Falcione, Tim Inzitari Date: November 2019
 
 // 3460:426 Lab 4A - Basic C shell
 
@@ -37,6 +37,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
 #include <unistd.h>
 
 #define MAX_ARGS	64
