@@ -105,6 +105,8 @@ int main(int argc, char *argv[]) {
 // C file1 file2
 void copy(char* buffer)
 {
+  // make use of LInux Function
+  //cp file1 file2
 
 }
 
@@ -115,7 +117,8 @@ D file
 */
 void delete(char* buffer)
 {
-
+   // make use of LInux Function
+  //rm file
 }
 
 /*
@@ -155,7 +158,9 @@ M file
 */
 void make(char* buffer)
 {
-
+   // make use of LInux Function
+  // nano file      
+  // terminate with ctrl X
 }
 
 /*
@@ -165,7 +170,8 @@ P file
 */
 void printFile(char* buffer)
 {
-
+   // make use of LInux Function
+  // more file
 }
 
 /*
@@ -185,7 +191,8 @@ S
 */
 void surf(char* buffer)
 {
-
+     // make use of LInux Function
+  // firefox &
 }
 
 /*
@@ -195,7 +202,8 @@ W
 */
 void wipe(char* buffer)
 {
-
+     // make use of LInux Function
+  // clear
 }
 
 /* 
@@ -205,7 +213,7 @@ X program
 */
 void exec(char* buffer)
 {
-
+     // remove X and simply use the name of the program
 }
 
 /* Parse Command function */
