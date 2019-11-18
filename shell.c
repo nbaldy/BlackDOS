@@ -101,6 +101,8 @@ int main(int argc, char *argv[]) {
 
 
 
+// NEXT 11 FUNCTIONS MIGHT NOT BE NEEDED
+
 /* Copy Shell function */
 // called with  
 // C file1 file2
