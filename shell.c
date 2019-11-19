@@ -37,7 +37,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <pthread.h>
 #include <unistd.h>
 
 #define MAX_ARGS	64
@@ -121,7 +120,11 @@ void checkPremade(struct command_t *command)
 
 // S doesn't work
   if (!strcmp(command->name, "S"))
-    command->name = "firefox&";
+  {
+    command->name = "firefox";
+    command->argc = 1;
+    command->argv[0] = "&";
+  }
 
   if (!strcmp(command->name, "W"))
     command->name = "clear";
@@ -134,6 +137,8 @@ void checkPremade(struct command_t *command)
     // PWD
     //ls -l
   }
+
+
 
 }
 
