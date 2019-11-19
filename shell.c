@@ -119,6 +119,7 @@ void checkPremade(struct command_t *command)
   if (!strcmp(command->name, "P"))
     command->name = "more";
 
+// S doesn't work
   if (!strcmp(command->name, "S"))
     command->name = "firefox&";
 
