@@ -66,6 +66,9 @@ void quitShell(char* buffer);
 void surf(char* buffer);
 void wipe(char* buffer);
 void exec(char* buffer);
+void printCommand_t(struct command_t x);
+
+void checkPremade(struct command_t*);
 
 
 int main(int argc, char *argv[]) {
@@ -74,19 +77,30 @@ int main(int argc, char *argv[]) {
    char cmdLine[MAX_LINE_LEN];
    struct command_t command;
 
-   while (TRUE) {
+   
+
+   
+
+
+   while (1) {
       printPrompt();
       /* Read the command line and parse it */
       readCommand(cmdLine);
-      ...
+      
       parseCommand(cmdLine, &command);
-      ...
+
+      checkPremade(&command);
+
       command.argv[command.argc] = NULL;
 
       /* Create a child process to execute the command */
       if ((pid = fork()) == 0) {
+
+        
          /* Child executing command */
-         execvp(command.name, command.argv);
+        int cStatus = execvp(command.name, command.argv);
+        printf("Bad Command, Press 'H' for help! \n");
+
       }
       /* Wait for the child to terminate */
       wait(&status);
@@ -100,6 +114,38 @@ int main(int argc, char *argv[]) {
 /* End basic shell */
 
 
+
+
+void checkPremade(struct command_t *command)
+{
+  if (!strcmp(command->name, "C"))
+    command->name = "cp";
+
+  if (!strcmp(command->name, "D"))
+    command->name = "rm";
+
+  if (!strcmp(command->name, "M"))
+    command->name = "nano";
+
+  if (!strcmp(command->name, "P"))
+    command->name = "more";
+
+  if (!strcmp(command->name, "S"))
+    command->name = "firefox&";
+
+  if (!strcmp(command->name, "W"))
+    command->name = "clear";
+
+  if (!strcmp(command->name, "X"))
+    command->name = command->argv[0];
+
+  if (!strcmp(command->name, "L"))
+  {
+    // PWD
+    //ls -l
+  }
+
+}
 
 // NEXT 11 FUNCTIONS MIGHT NOT BE NEEDED
 
@@ -219,6 +265,17 @@ void exec(char* buffer)
      // remove X and simply use the name of the program
 }
 
+
+void printCommand_t(struct command_t x)
+{
+  printf("Name: %s, argc: %i", x.name, x.argc);
+  for (int i = 0; i < x.argc; ++i)
+  {
+    printf("arg: %s\n", x.argv[i]);
+  }
+
+}
+
 /* Parse Command function */
 
 /* Determine command name and construct the parameter list.
@@ -257,7 +314,7 @@ void printPrompt() {
    /* Build the prompt string to have the machine name,
     * current directory, or other desired information
     */
-   promptString = ...;
+   char* promptString = "linux tsi3,neb45,emf66|?>";
    printf("%s ", promptString);
 }
 
