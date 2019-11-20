@@ -19,7 +19,7 @@
 /*                                                                        */
 /*                                                                        */
 /*                                                                        */
-/* Signed:_______ Nicole Baldy, Elaine Falcione, Tim Inzitari_______ Date:______9/19/19_______        */
+/* Signed:_______ Nicole Baldy, Elena Falcione, Tim Inzitari_______ Date:______9/19/19_______        */
 /*                                                                        */
 /*                                                                        */
 /* 3460:4/526 BlackDOS2020 kernel, Version 1.04, Fall 2019.               */
@@ -27,9 +27,9 @@
 void handleInterrupt21(int,int,int,int);
 void printLogo();
 
-void main()
-{
+void main() {
   char buffer[512];
+
   makeInterrupt21();
   interrupt(33,2,buffer,258,1);
   interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
@@ -39,8 +39,7 @@ void main()
   while (1) ;
 }
 
-void printLogo()
-{
+void printLogo() {
   interrupt(33,0,"       ___   `._   ____  _            _    _____   ____   _____ \r\n\0",0);
   interrupt(33,0,"      /   \\__/__> |  _ \\| |          | |  |  __ \\ / __ \\ / ____|\r\n\0",0);
   interrupt(33,0,"     /_  \\  _/    | |_) | | __ _  ___| | _| |  | | |  | | (___ \r\n\0",0);
@@ -54,11 +53,21 @@ void printLogo()
 /* MAKE FUTURE UPDATES HERE */
 /* VVVVVVVVVVVVVVVVVVVVVVVV */
 
-
+/* check if the first letter of the file is capital */
+int is_capital(char c)
+{
+   if(c >= 'A' && c <= 'Z')
+   {
+      return 1;
+   }
+   else
+   {
+      return 0;
+   }
+}
 
 /* Prints a string to either the console (if d=0) or printer (d=1) */
-void printString(char* c, int d)
-{
+void printString(char* c, int d) {
 	int out;
 	int secondParam;
 	char r;
@@ -66,7 +75,7 @@ void printString(char* c, int d)
 
   out = 16;
 	secondParam = 14 * 256;
-	if (d == 1){
+	if (d == 1) {
 		out = 23;
 		secondParam = 0;
 	}
@@ -74,16 +83,14 @@ void printString(char* c, int d)
   /*print until null terminator is found*/
 	i = 0;
 	r = c[0];
-	while (r != '\0')
-	{
+	while (r != '\0') {
 	   interrupt(out, secondParam + r, 0,0,0);
 	   r= c[++i];
 	 }
 }
 
 /* Prints a file "filename" with "sectorCount" sectors to console if d = 0 and printer if d = 1*/
-void printFile(char* filename, int d)
-{
+void printFile(char* filename, int d) {
   char buffer[0x15E00]; /*max file size*/
   int fileSize;
   /* ints for printing management */
@@ -96,8 +103,7 @@ void printFile(char* filename, int d)
   interrupt(33, 3, filename, buffer, &fileSize);
   fileSize = fileSize*512; /*512 bytes per sector*/
 
-  if(d==0)
-  {
+  if(d==0) {
     out = 16;
   	secondParam = 14 * 256;
   }
@@ -107,19 +113,17 @@ void printFile(char* filename, int d)
 		secondParam = 0;
 	}
 
-  /*print until null terminator is found*/
+  /*print until end of file*/
 	i = 0;
 	r = buffer[0];
-	while (i < fileSize)
-	{
+	while (i < fileSize) {
 	   interrupt(out, secondParam + r, 0,0,0);
 	   r= buffer[++i];
 	 }
 }
 
 /* Gets a line of input from the user, updating stringarray */
-void readString(char* stringarray)
-{
+void readString(char* stringarray) {
   int count;
   int i;
   char* c;
@@ -128,13 +132,10 @@ void readString(char* stringarray)
   c = interrupt(22,0,0,0,0);
   count = 0;
 
-  while (c != 13)
-  { /*until enter is pressed - print keystroke unless backspace*/
-      if (c == 8)
-      {
+  while (c != 13) { /*until enter is pressed - print keystroke unless backspace*/
+      if (c == 8) {
         /*backspace - decrement count if not empty*/
-        if (count > 0)
-        {
+        if (count > 0) {
           interrupt(16,14 * 256 + c,0,0,0);
           count--;
         }
@@ -159,8 +160,7 @@ void readString(char* stringarray)
 
 
 /*  Reads an integer from the console */
-void readInt(int* num)
-{
+void readInt(int* num) {
   char b[6];
   int i;
 
@@ -169,8 +169,7 @@ void readInt(int* num)
   *num=0;
   i=0;
   /* convert from char array to int */
-  while((b[i] != '\0') && (i < 6))
-  {
+  while((b[i] != '\0') && (i < 6)) {
     *num = *num * 10;
     *num = *num + (b[i++] - '0');
   }
@@ -201,8 +200,7 @@ void intToStr (int num, char* str) {
     i=0;
 
     /*special case - number is 0*/
-    if(num == 0)
-    {
+    if(num == 0) {
       str[0] = '0';
       str[1] = '\0';
       return;
@@ -219,23 +217,20 @@ void intToStr (int num, char* str) {
     /*reverse the digits*/
     i = 0;
     str[digits] = '\0';
-    while (digits > 0)
-    {
+    while (digits > 0) {
         str[--digits] = tmp[i++];
     }
 }
 
 /* use intToStr and printString to write an integer to the console or printer*/
-void writeInt(int num, int out)
-{
-  char* str[6];
+void writeInt(int num, int out) {
+  char str[6];
   intToStr(num,str);
-  interrupt(33,0, str, out,0);
+  interrupt(33,0, str, out, 0);
 }
 
 /* Takes absolute sector, calculates and reads relative sector into buffer */
-readSectors(char *buffer, int sector, int sectorCount)
-{
+readSectors(char *buffer, int sector, int sectorCount) {
   int trackNo;
   int relSecNo;
   int headNo;
@@ -267,8 +262,7 @@ readSectors(char *buffer, int sector, int sectorCount)
 
 }
 
-writeSectors(char *buffer, int sector, int sectorCount)
-{
+writeSectors(char *buffer, int sector, int sectorCount) {
   int trackNo;
   int relSecNo;
   int headNo;
@@ -300,14 +294,144 @@ writeSectors(char *buffer, int sector, int sectorCount)
 
 }
 
+
+void writeFile(char* name, char* buffer, int numSectors) {
+  int dirIndex = 0; /*index for traversing directory*/
+  int sector = 0; /*sector to store file */
+  int empty = -1; /* index of first empty directory entry */
+  int j; /*loop through filenames*/
+  char directory[512], map[512];
+
+  /* illegal to save file beginning with a capital letter - these are reserved for OS files*/
+  if(is_capital(name[0]))
+  {
+    interrupt(33,15,1,0,0);
+  }
+
+  /* Load disk directory and map into memory */
+  interrupt(33, 2, directory, 257, 1);
+  interrupt(33, 2, map, 256, 1);
+
+  /*Loop through 32 possible files */
+  for (dirIndex = 0; dirIndex < 512; dirIndex += 16) {
+    /* save first empty slot */
+    if (!directory[dirIndex] && empty < 0) {
+      empty = dirIndex;
+    }
+
+      /* check other directory contents to ensure name is unique */
+      for (j=0; j<8 && name[j] != '\0' && name[j] == directory[dirIndex+j]; j++) {}
+
+      /*Filename match - already exists, throw error */
+      if (j==8 || (!name[j] && !directory[dirIndex+j]))
+      {
+        interrupt(33, 15, 1, 0, 0);
+      }
+  }
+
+  /* no empty space left in directory - error */
+  if(empty < 0) {
+    interrupt(33, 15, 2,0,0);
+  }
+
+  /* find space for file in map */
+  for (sector=1; sector<=512-numSectors; sector++) {
+    for(j=0; j<numSectors && map[sector+j]==0; j++) {}
+
+    /*found enough empty sectors*/
+    if (j==numSectors) { break; }
+
+    /* otherwise skip sectors already checked */
+    sector = sector+j+1;
+  }
+
+  /* not enough space left in map, throw error */
+  if(sector>512-numSectors) {
+    interrupt(33, 15, 1, 0, 0);
+  }
+
+  /* Reserve space in memory */
+  for(j=0; j<numSectors; j++) {
+    map[sector+j] = -1;
+  }
+
+/* copy filename to directory */
+  for (j=0; j<8; j++) {
+    directory[empty+j] = name[j];
+  }
+  directory[empty+8] = sector;
+  directory[empty+9] = numSectors;
+
+  /* Write file to disk */
+  interrupt(33, 6, buffer, sector, numSectors);
+
+  /* Write modified map and directory to disk */
+  interrupt(33, 6, directory, 257, 1);
+  interrupt(33, 6, map, 256, 1);
+
+}
+
+void deleteFile(char* name) {
+  int dirIndex = 0; /* index for traversing directory */
+  int sector = 0; /* sector at which file is stored */
+  int numSectors; /* length of file */
+  int j; /* loop through filenames */
+  char directory[512], map[512];
+
+  /* illegal to delete file beginning with a capital letter - these are reserved for OS files*/
+  if(is_capital(name[0]))
+  {
+    interrupt(33,15,1,0,0);
+  }
+
+
+  /* Load disk directory and map into memory */
+  interrupt(33, 2, directory, 257, 1);
+  interrupt(33, 2, map, 256, 1);
+
+  /*Loop through 32 possible files */
+  for (dirIndex = 0; dirIndex < 512; dirIndex += 16) {
+    /* Try to match filename */
+    for (j=0; j<8 && name[j] != '\0' && name[j] == directory[dirIndex+j]; j++) {}
+
+    /* got to end of filename - filenames match */
+    if (j==8 || (!name[j] && !directory[j])) {
+      /* save sector information for map before deleting */
+      sector = directory[dirIndex+8];
+      numSectors = directory[dirIndex+9];
+      directory[dirIndex+8] = 0;
+      directory[dirIndex+9] = 0;
+
+      /*printString("passed if\0", 0);*/
+
+      /* overwrite filename with 0s */
+      for (j=0; j<8; j++) {
+        directory[dirIndex+j] = 0;
+      }
+
+      /* set map bytes corresponding to file's sectors to zero*/
+      for(j = 0; j < numSectors; ++j) {
+        map[sector + j] = 0;
+      }
+
+      /*write directory and map back to disk*/
+      interrupt(33, 6, directory, 257, 1);
+      interrupt(33, 6, map, 256, 1);
+
+      return;
+    }
+  }
+
+  /*error, file not found*/
+  interrupt(33, 15, 0, 0, 0);
+}
+
 /* bx = background color, cx = character color, and clear screen */
-void clearScreen(int bx, int cx)
-{
+void clearScreen(int bx, int cx) {
   int i = 0;
 
   /* clear screen */
-  for (i; i < 24; ++i)
-  {
+  for (i; i < 24; ++i) {
     interrupt(16,14*256 + '\r',0,0,0);
     interrupt(16,14*256 + '\n',0,0,0);
   }
@@ -322,8 +446,7 @@ void clearScreen(int bx, int cx)
 }
 
 /* Reads a file from the directory and runs it */
-void runProgram(char* name, int segment)
-{
+void runProgram(char* name, int segment) {
   /*max size - 26 sectors*/
   char buffer[0x3400];
   int baseSegment;
@@ -341,8 +464,7 @@ void runProgram(char* name, int segment)
   baseSegment = 4096 * segment;
 
   /* transfer loaded file from buffer into memory at computed segment */
-  for (offset=0; offset < 0x3400; offset++)
-  {
+  for (offset=0; offset < 0x3400; offset++) {
     putInMemory(baseSegment, offset, buffer[offset]);
   }
 
@@ -353,21 +475,17 @@ void runProgram(char* name, int segment)
 
 }
 
-void readFile(char* fname, char* buffer, int* size)
-{
+void readFile(char* fname, char* buffer, int* size) {
   char directory[512];
   int i,j, found;
   /* Load disk directory into memory */
   interrupt(33, 2, directory, 257, 1);
 
   /*Loop through 32 possible files */
-  for (i=0; i<32 && directory[16*i] != '\0'; i++)
-  {
+  for (i=0; i<32 && directory[16*i] != '\0'; i++) {
     found = 1; /*use as flag - clear when chars don'tmatch*/
-    for (j=0; j<8 && fname[j]!='\0' ; j++)
-    {
-      if(fname[j] != directory[16*i + j])
-      {
+    for (j=0; j<8 && fname[j]!='\0' ; j++) {
+      if(fname[j] != directory[16*i + j]) {
         found = 0;
         break;
       }
@@ -377,8 +495,7 @@ void readFile(char* fname, char* buffer, int* size)
       break;
   }
 
-  if (found)
-  {
+  if (found) {
     int startPos;
     startPos = directory[16*i + 8];
     *size = directory[16*i +9];
@@ -392,18 +509,14 @@ void readFile(char* fname, char* buffer, int* size)
   interrupt(33,15,0,0,0);
 }
 
-void stop()
-{
+void stop() {
   char buffer[2];
-  /*interrupt(33, 0, "\r\npress enter to continue\r\n\0", 0, 0);*/
-  interrupt(33, 1, buffer, 0, 0);
   launchProgram(8192);
 }
 
 /* ^^^^^^^^^^^^^^^^^^^^^^^^ */
 /* MAKE FUTURE UPDATES HERE */
-void error(int bx)
-{
+void error(int bx) {
    switch (bx) {
 	   case 0:
 	   /* error 0 = "File not found." */
@@ -439,8 +552,7 @@ void error(int bx)
    interrupt(33, 5, 0, 0, 0);
 }
 
-void handleInterrupt21(int ax, int bx, int cx, int dx)
-{
+void handleInterrupt21(int ax, int bx, int cx, int dx) {
    /*return;*/
   switch(ax) {
    case 0:  printString(bx, cx); break;
@@ -450,7 +562,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     case 4: runProgram(bx, cx); break;
     case 5: stop(); break;
     case 6: writeSectors(bx,cx,dx); break;
-     /*case 7: case 8: case 9: case 10: */
+    case 7: deleteFile(bx); break;
+    case 8: writeFile(bx,cx,dx); break;
+    /* case 9: case 10: */
     case 11: printFile(bx, cx); break;
     case 12: clearScreen(bx,cx); break;
     case 13: writeInt(bx,cx); break;
