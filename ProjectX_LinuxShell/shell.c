@@ -32,12 +32,15 @@
  * names like "minishell.h"
  *
  * The focus on this exercise is to use fork, PATH variables,
- * and execv. 
+ * and execv.
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+#include <unistd.h> //for fork
+#include <sys/wait.h> // for wait()
+
 
 #define MAX_ARGS	64
 #define MAX_ARG_LEN	16
@@ -64,34 +67,30 @@ int main(int argc, char *argv[]) {
    int status;
    char cmdLine[MAX_LINE_LEN];
    struct command_t command;
-
-   
-
-   
-
-
+   printf("test?");
    while (1) {
       printPrompt();
       /* Read the command line and parse it */
       readCommand(cmdLine);
-      
+
       parseCommand(cmdLine, &command);
 
       checkPremade(&command);
 
-      command.argv[command.argc] = NULL;
+      // Commands affecting flow control - quit and empty
+      if(!strcmp(command.name, "Q")) break;
+      if(!strcmp(command.name, "")) continue;
 
+      command.argv[command.argc] = NULL;
       /* Create a child process to execute the command */
       if ((pid = fork()) == 0) {
-
-        
          /* Child executing command */
-        int cStatus = execvp(command.name, command.argv);
+        execvp(command.name, command.argv);
         printf("Bad Command, Press 'H' for help! \n");
 
       }
       /* Wait for the child to terminate */
-      wait(&status);
+      waitpid(pid, &status,0);
    }
 
    /* Shell termination */
@@ -100,8 +99,6 @@ int main(int argc, char *argv[]) {
 }
 
 /* End basic shell */
-
-
 
 
 void checkPremade(struct command_t *command)
@@ -134,21 +131,42 @@ void checkPremade(struct command_t *command)
 
   if (!strcmp(command->name, "L"))
   {
-    // PWD
-    //ls -l
-  }
+    printf("\n");
+
+    // Execute PWD
+    char* args[2];
+    args[0] = "pwd";
+    args[1] = NULL;
+
+    printf("\n");
+
+    /* Create a child to print out pwd */
+    int status, pid;
+    if ((pid = fork()) == 0) {
+
+      execvp("pwd", args);
+    }
+    /* Wait for pwd to terminate */
+    waitpid(pid, &status,0);
+    printf("\n");
 
 
-
+    //Prepare to execute list
+    command->name = "ls";
+    command->argc = 2;
+    command->argv[0] = "ls";
+    command->argv[1] = "-l";
+ }
 }
+
 
 
 void printCommand_t(struct command_t x)
 {
-  printf("Name: %s, argc: %i", x.name, x.argc);
+  printf("Name: %s, argc: %i\n", x.name, x.argc);
   for (int i = 0; i < x.argc; ++i)
   {
-    printf("arg: %s\n", x.argv[i]);
+    printf("arg%i: %s\n", i, x.argv[i]);
   }
 
 }
@@ -191,7 +209,7 @@ void printPrompt() {
    /* Build the prompt string to have the machine name,
     * current directory, or other desired information
     */
-   char* promptString = "linux tsi3,neb45,emf66|?>";
+   char* promptString = "linux (tsi3 emf66 neb45) ¯\\_(ツ)_/¯ |>";
    printf("%s ", promptString);
 }
 
