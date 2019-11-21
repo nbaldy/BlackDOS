@@ -1,0 +1,4 @@
+Manual for Elena, Nicole, and Tim's Shell:
+
+command
+C

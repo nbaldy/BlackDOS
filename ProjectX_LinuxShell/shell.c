@@ -67,7 +67,6 @@ int main(int argc, char *argv[]) {
    int status;
    char cmdLine[MAX_LINE_LEN];
    struct command_t command;
-   printf("test?");
    while (1) {
       printPrompt();
       /* Read the command line and parse it */
@@ -78,7 +77,10 @@ int main(int argc, char *argv[]) {
       checkPremade(&command);
 
       // Commands affecting flow control - quit and empty
-      if(!strcmp(command.name, "Q")) break;
+      if(!strcmp(command.name, "Q")) {
+        kill(pid,-1);
+        break;
+      }
       if(!strcmp(command.name, "")) continue;
 
       command.argv[command.argc] = NULL;
@@ -103,40 +105,52 @@ int main(int argc, char *argv[]) {
 
 void checkPremade(struct command_t *command)
 {
-  if (!strcmp(command->name, "C"))
+  if (!strcmp(command->name, "C")) {
     command->name = "cp";
+    command->argv[0] = "cp";
+  }
 
-  if (!strcmp(command->name, "D"))
+  if (!strcmp(command->name, "D")) {
     command->name = "rm";
+    command->argv[0] = "rm";
+  }
 
-  if (!strcmp(command->name, "M"))
+  if (!strcmp(command->name, "M")) {
     command->name = "nano";
+    command->argv[0] = "nano";
+  }
 
-  if (!strcmp(command->name, "P"))
+  if (!strcmp(command->name, "P")) {
     command->name = "more";
+    command->argv[0] = "more";
+  }
 
-// S doesn't work
   if (!strcmp(command->name, "S"))
   {
     command->name = "firefox";
     command->argc = 1;
-    command->argv[0] = "&";
+    command->argv[0] = "firefox&";
   }
 
-  if (!strcmp(command->name, "W"))
+  if (!strcmp(command->name, "W")){
     command->name = "clear";
+    command->argv[0] = "clear";
+  }
 
-  if (!strcmp(command->name, "X"))
-    command->name = command->argv[0];
+  if (!strcmp(command->name, "X")){
+    command->name = command->argv[1];
+    command->argv[0] = command->argv[1];
+    command->argc = 1;
+  }
 
   if (!strcmp(command->name, "L"))
   {
     printf("\n");
 
     // Execute PWD
-    char* args[2];
-    args[0] = "pwd";
-    args[1] = NULL;
+    char* argv[2];
+    argv[0] = "pwd";
+    argv[1] = NULL;
 
     printf("\n");
 
@@ -144,7 +158,7 @@ void checkPremade(struct command_t *command)
     int status, pid;
     if ((pid = fork()) == 0) {
 
-      execvp("pwd", args);
+      execvp("pwd", argv);
     }
     /* Wait for pwd to terminate */
     waitpid(pid, &status,0);
@@ -156,6 +170,18 @@ void checkPremade(struct command_t *command)
     command->argc = 2;
     command->argv[0] = "ls";
     command->argv[1] = "-l";
+ }
+
+ if (!strcmp(command->name, "E")) {
+   command->name = "echo";
+   command->argv[0] = "echo";
+ }
+
+ if (!strcmp(command->name, "H")) {
+   command->name = "more";
+   command->argc = 2;
+   command->argv[0] = "more";
+   command->argv[1] = "help.txt";
  }
 }
 
@@ -209,7 +235,7 @@ void printPrompt() {
    /* Build the prompt string to have the machine name,
     * current directory, or other desired information
     */
-   char* promptString = "linux (tsi3 emf66 neb45) ¯\\_(ツ)_/¯ |>";
+   char* promptString = "\nlinux (tsi3 emf66 neb45) ¯\\_(ツ)_/¯ |>";
    printf("%s ", promptString);
 }
 
