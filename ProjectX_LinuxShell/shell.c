@@ -93,6 +93,7 @@ int main(int argc, char *argv[]) {
       }
       /* Wait for the child to terminate */
       waitpid(pid, &status,0);
+      kill(pid,-1);
    }
 
    /* Shell termination */
