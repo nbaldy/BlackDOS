@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
         execvp(command.name, command.argv);
         printf("Bad Command, Press 'H' for help! \n");
         return 0;
-        
+
       }
       /* Wait for the child to terminate */
       waitpid(pid, &status,0);
@@ -140,14 +140,12 @@ void checkPremade(struct command_t *command)
   }
 
   if (!strcmp(command->name, "X\0")){
-  	command->name = command->argv[1];
-  	int newS = 1;
-  	for (int i = 0; i < command->argc; ++i)
+    command->name = command->argv[1];
+  	for (int i = 0; i < command->argc; i++)
   	{
-		command->argv[i] = command->argv[i+1];
-		newS++;
+  		command->argv[i] = command->argv[i+1];
   	}
-  	command->argc = newS;
+  	command->argc = command->argc-1;
   }
 
   if (!strcmp(command->name, "L\0"))
