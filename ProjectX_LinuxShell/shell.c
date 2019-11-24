@@ -188,6 +188,19 @@ void checkPremade(struct command_t *command)
    command->argv[0] = "more";
    command->argv[1] = "help.txt";
  }
+
+ if(!strcmp(command->name, "G\0"))
+ {
+   // put the C file in right spot
+   // G cFile Exe -> gcc -o exe cFile
+   command->argv[3] = command->argv[1];
+
+   command->name = "gcc";
+   command->argv[0] = "gcc";
+   command->argv[1] = "-o";
+   command->argc = 4;
+
+ }
 }
 
 

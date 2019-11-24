@@ -1,4 +1,17 @@
-Manual for Elena, Nicole, and Tim's Shell:
+Lab X - the shell
+
+This program can be compiled using our makefile (make) and run
+by the command ./shell
+
+The makefile was created by the following tutorial:
+http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
+Adding the ulimit command was based on the following stackoverflow:
+https://stackoverflow.com/questions/2271447/set-stack-size-in-a-makefile
+
+This shell can be used as an extension to the Linux shell in that all
+Linux commands can be run in this shell, while the following Commands
+are simplified Linux commands which are also supported
+
 
 Command   Args       Explanation
 
