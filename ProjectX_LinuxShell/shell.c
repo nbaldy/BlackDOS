@@ -77,8 +77,8 @@ int main(int argc, char *argv[]) {
       checkPremade(&command);
 
       // Commands affecting flow control - quit and empty
-      if(!strcmp(command.name, "Q")) {
-        return 0;
+      if(!strcmp(command.name, "Q\0")) {
+        kill(pid,-1);
         break;
       }
       if(!strcmp(command.name, "")) continue;
@@ -89,7 +89,8 @@ int main(int argc, char *argv[]) {
          /* Child executing command */
         execvp(command.name, command.argv);
         printf("Bad Command, Press 'H' for help! \n");
-
+        return 0;
+        
       }
       /* Wait for the child to terminate */
       waitpid(pid, &status,0);
@@ -106,39 +107,39 @@ int main(int argc, char *argv[]) {
 
 void checkPremade(struct command_t *command)
 {
-  if (!strcmp(command->name, "C")) {
+  if (!strcmp(command->name, "C\0")) {
     command->name = "cp";
     command->argv[0] = "cp";
   }
 
-  if (!strcmp(command->name, "D")) {
+  if (!strcmp(command->name, "D\0")) {
     command->name = "rm";
     command->argv[0] = "rm";
   }
 
-  if (!strcmp(command->name, "M")) {
+  if (!strcmp(command->name, "M\0")) {
     command->name = "nano";
     command->argv[0] = "nano";
   }
 
-  if (!strcmp(command->name, "P")) {
+  if (!strcmp(command->name, "P\0")) {
     command->name = "more";
     command->argv[0] = "more";
   }
 
-  if (!strcmp(command->name, "S"))
+  if (!strcmp(command->name, "S\0"))
   {
     command->name = "firefox";
     command->argc = 1;
     command->argv[0] = "firefox&";
   }
 
-  if (!strcmp(command->name, "W")){
+  if (!strcmp(command->name, "W\0")){
     command->name = "clear";
     command->argv[0] = "clear";
   }
 
-  if (!strcmp(command->name, "X")){
+  if (!strcmp(command->name, "X\0")){
   	command->name = command->argv[1];
   	int newS = 1;
   	for (int i = 0; i < command->argc; ++i)
@@ -149,7 +150,7 @@ void checkPremade(struct command_t *command)
   	command->argc = newS;
   }
 
-  if (!strcmp(command->name, "L"))
+  if (!strcmp(command->name, "L\0"))
   {
     printf("\n");
 
@@ -178,12 +179,12 @@ void checkPremade(struct command_t *command)
     command->argv[1] = "-l";
  }
 
- if (!strcmp(command->name, "E")) {
+ if (!strcmp(command->name, "E\0")) {
    command->name = "echo";
    command->argv[0] = "echo";
  }
 
- if (!strcmp(command->name, "H")) {
+ if (!strcmp(command->name, "H\0")) {
    command->name = "more";
    command->argc = 2;
    command->argv[0] = "more";
