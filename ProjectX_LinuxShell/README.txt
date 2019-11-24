@@ -1,17 +1,18 @@
 Lab X - the shell
 
 This program can be compiled using our makefile (make) and run
-by the command ./shell
+using the command ./shell
 
 The makefile was created by the following tutorial:
 http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/
 Adding the ulimit command was based on the following stackoverflow:
 https://stackoverflow.com/questions/2271447/set-stack-size-in-a-makefile
+Figuring out execvp and some of the Linux commands was based on the Linux manual:
+https://linux.die.net/man/3/execvp
 
 This shell can be used as an extension to the Linux shell in that all
-Linux commands can be run in this shell, while the following Commands
+Linux commands can be run in this shell, while the following commands
 are simplified Linux commands which are also supported
-
 
 Command   Args       Explanation
 
