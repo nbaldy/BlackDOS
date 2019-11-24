@@ -139,9 +139,14 @@ void checkPremade(struct command_t *command)
   }
 
   if (!strcmp(command->name, "X")){
-    command->name = command->argv[1];
-    command->argv[0] = command->argv[1];
-    command->argc = 1;
+  	command->name = command->argv[1];
+  	int newS = 1;
+  	for (int i = 0; i < command->argc; ++i)
+  	{
+		command->argv[i] = command->argv[i+1];
+		newS++;
+  	}
+  	command->argc = newS;
   }
 
   if (!strcmp(command->name, "L"))
