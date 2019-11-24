@@ -1,22 +1,19 @@
 # Build and Run Shell.c
-.PHONY: all
-all : shell
 
-shell : shell.o
-	gcc -O3 shell.o -o shell
+#compiler
+CC = gcc
 
-shell.o: shell.c
-	gcc -O3 -std=c11 -c shell.c
+#compiler flags
+# -g to add debugging info, -Wall turns on compiler warnings
+CFLAGS = -g -Wall
 
-.PHONY: run
-run: shell.c
-	ulimit -u
-	./shell
+#The build target executable
+TARGET = shell
 
-.PHONY: clean
-clean :
-	@rm -f shell shell.o
+all:$(TARGET)
 
-.PHONY: cleanall
-cleanall :
-	@make clean 
+$(TARGET): $(TARGET).c
+	ulimit -u && $(CC) $(CFLAGS) -o $(TARGET) $(TARGET).c
+
+clean:
+	$(RM) $(TARGET) $(TARGET).o
