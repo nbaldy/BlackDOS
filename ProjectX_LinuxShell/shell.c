@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
 
       // Commands affecting flow control - quit and empty
       if(!strcmp(command.name, "Q")) {
-        kill(pid,-1);
+        return 0;
         break;
       }
       if(!strcmp(command.name, "")) continue;
