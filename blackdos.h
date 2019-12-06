@@ -10,5 +10,7 @@
 #define WRTESCTR(x,y,z) interrupt(33,6,x,y,z) /*(char *buffer, int sector, int sectorCount)*/
 #define READFILE(x,y,z) interrupt(33,3,x,y,z) /*(char* fname, char* buffer, int* size)*/
 #define REBOOT() interrupt(25,0,0,0,0)
-#define RUNPROGRAM(x, y) interrupt(33, 4, x, y, 0) /*(char* name, int segment)*/
+#define RUNPROGRAM(x, y) interrupt(33,4,x,y,0) /*(char* name, int segment)*/
+#define WRITEFILE(x,y,z) interrupt(33,8,x,y,z) /*(char* name, char* buffer, int numSectors)*/
+#define DELFILE(x) interrupt(33,7,x,0,0)  /*(char* name)*/
 #define END interrupt(33,5,0,0,0)
