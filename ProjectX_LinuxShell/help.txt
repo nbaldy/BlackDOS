@@ -1,0 +1,19 @@
+Manual for Elena, Nicole, and Tim's Shell:
+
+Command   Args       Explanation
+
+C         F1, F2      Copy File1 to File2 without deleting File1
+D         File        Delete File1
+E         Comment     Echo Comment onto screen
+H                     Help - display this manual
+G         cFile, Exe  GCC compile C file
+L                     List contents of current directory
+M         File        Make (or edit) a text file
+P         File        Print contents of File
+Q                     Quit Shell
+W                     Wipe (Clear) screen
+X         Program     Execute program
+
+
+Note that, if calling an executable file, it must be called with
+./Program, where Program is the executable name
